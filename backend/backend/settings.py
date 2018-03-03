@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import dj_database_url
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -25,8 +27,9 @@ SECRET_KEY = 'a)@1%_ca#d17cvqn$i1m7s%)tm^7$6b(th+%pxjjqor1^=t1^$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+AUTH_USER_MODEL = 'users.User'
 
 # Application definition
 
@@ -39,9 +42,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'graphene_django',
-    'simple_app',
+    'graphene_django'
 ]
+
+LOCAL_APPS = [
+    'backend',
+    'msgs',
+    'profiles',
+    'users'
+]
+
+INSTALLED_APPS = INSTALLED_APPS + LOCAL_APPS
 
 GRAPHENE = {
     'SCHEMA': 'backend.schema.schema',
@@ -62,7 +73,7 @@ JWT_VERIFY_EXPIRATION = False
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'backend.middleware.JWTMiddleware',
@@ -70,9 +81,8 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -99,12 +109,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+DATABASE_URL = 'postgres://jciealisebrbmw:VJU83KGUUnt6Ter6MamVEsAM2G@ec2-79-125-120-89.eu-west-1.compute.amazonaws.com:5432/daisbq0hfrar6b'
+DATABASES = {'default': dj_database_url.config(default=DATABASE_URL)}
 
 
 # Password validation

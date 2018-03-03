@@ -1,17 +1,16 @@
 import graphene
-
-import simple_app.schema
+import msgs.schema
 
 
 class Mutations(
-    simple_app.schema.Mutation,
-    graphene.ObjectType,
+    msgs.schema.Mutation,
+    graphene.ObjectType
 ):
     pass
 
 
 class Queries(
-    simple_app.schema.Query,
+    msgs.schema.Query,
     graphene.ObjectType
 ):
     pass

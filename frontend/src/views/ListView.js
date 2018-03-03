@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { gql, graphql } from 'react-apollo'
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag';
 import queryString from 'query-string'
 
 export const query = gql`

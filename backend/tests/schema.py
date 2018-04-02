@@ -52,8 +52,8 @@ class Mutation(object):
 
 
 class Query(object):
-    # all_tests = DjangoFilterConnectionField(TestType)
-    all_tests = graphene.List(TestType)
+    all_tests = DjangoFilterConnectionField(TestType)
+    # all_tests = graphene.List(TestType)
     test = graphene.Field(
         TestType,
         id=graphene.ID(),

@@ -6,10 +6,16 @@ import queryString from 'query-string'
 
 export const query = gql`
     query ListViewSearch($search: String, $endCursor: String) {
-        allTests(first: 2, test_Icontains: $search, after: $endCursor) {
+        allTests(first: 2, name_Icontains: $search, after: $endCursor) {
             edges {
                 node {
-                    id, test
+                    id
+                    name
+                    description
+                    created
+                    minutes
+                    uuid
+                    
                 }
             },
             pageInfo {
@@ -68,8 +74,8 @@ class ListView extends React.Component {
                 </form>
                 {data.allTests.edges.map(item => (
                     <p key={item.node.id}>
-                        <Link to={`/messages/${item.node.id}/`}>
-                            {item.node.message}
+                        <Link to={`/tests/${item.node.uuid}/`}>
+                            {item.node.name}
                         </Link>
                     </p>
                 ))}

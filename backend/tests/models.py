@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from model_utils.models import TimeStampedModel
 
+from core.models.uuid import UuidMixin
 from core.utils import generate_uuid
 from users.models import User
 
@@ -23,7 +24,7 @@ class Label(models.Model):
         return self.name
 
 
-class Question(TimeStampedModel):
+class Question(UuidMixin, TimeStampedModel):
     RADIO = 'radio'
     CHECKBOX = 'checkbox'
     TEXT = 'text'
@@ -41,7 +42,7 @@ class Question(TimeStampedModel):
     other_url = models.CharField(_('other URL'), max_length=255, blank=True, null=True)
 
 
-class Answer(TimeStampedModel):
+class Answer(UuidMixin, TimeStampedModel):
     """
     Answer model
     """
@@ -62,7 +63,7 @@ class Answer(TimeStampedModel):
         return self.text
 
 
-class Test(TimeStampedModel):
+class Test(UuidMixin, TimeStampedModel):
     """
     Test model
     """
@@ -85,7 +86,7 @@ class Test(TimeStampedModel):
         return self.questions.order_by('?')
 
 
-class TestResult(TimeStampedModel):
+class TestResult(UuidMixin, TimeStampedModel):
     """
     Test Answers model
     """
@@ -163,7 +164,7 @@ class TestResult(TimeStampedModel):
         return self.answers.filter(correct=True)
 
 
-class QuestionAnswer(models.Model):
+class QuestionAnswer(UuidMixin, TimeStampedModel):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     answer = JSONField()

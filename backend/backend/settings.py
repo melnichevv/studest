@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 
 LOCAL_APPS = [
     'backend',
+    'core',
     'msgs',
     'profiles',
     'tests',

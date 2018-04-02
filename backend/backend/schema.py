@@ -1,16 +1,19 @@
 import graphene
-import msgs.schema
+import msgs.schema as msgs_schema
+import tests.schema as test_schema
 
 
 class Mutations(
-    msgs.schema.Mutation,
+    msgs_schema.Mutation,
+    test_schema.Mutation,
     graphene.ObjectType
 ):
     pass
 
 
 class Queries(
-    msgs.schema.Query,
+    msgs_schema.Query,
+    test_schema.Query,
     graphene.ObjectType
 ):
     pass

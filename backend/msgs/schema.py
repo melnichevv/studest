@@ -5,19 +5,13 @@ import graphene
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
-
-from users.models import User
-from . import models
-
-
-class UserType(DjangoObjectType):
-    class Meta:
-        model = User
+from msgs.models import Message
+from users.schema import UserType
 
 
 class MessageType(DjangoObjectType):
     class Meta:
-        model = models.Message
+        model = Message
         filter_fields = {'message': ['icontains']}
         interfaces = (graphene.Node,)
 
@@ -33,7 +27,7 @@ class CreateMessageMutation(graphene.Mutation):
     @staticmethod
     def mutate(self, info, message):
         context = info.context
-        message = models.Message(user=context.user, message=message)
+        message = Message(user=context.user, message=message)
         if not context.user.is_authenticated:
             return CreateMessageMutation(status=403)
 
@@ -61,11 +55,11 @@ class Query(object):
                              message=graphene.String())
 
     def resolve_all_messages(self, info, **kwargs):
-        return models.Message.objects.all()
+        return Message.objects.all()
 
     def resolve_message(self, info, id):
         rid = from_global_id(id)
-        return models.Message.objects.get(pk=rid[1])
+        return Message.objects.get(pk=rid[1])
 
     def resolve_current_user(self, info, **kwargs):
         context = info.context

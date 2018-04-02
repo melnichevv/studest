@@ -20,18 +20,18 @@ query ListViewSearch($search: String, $endCursor: String) {
     }
   }
 }
-`
+`;
 
 class ListView extends React.Component {
   handleSearchSubmit(e) {
-    e.preventDefault()
-    let data = new FormData(this.form)
-    let query = `?search=${data.get('search')}`
+    e.preventDefault();
+    let data = new FormData(this.form);
+    let query = `?search=${data.get('search')}`;
     this.props.history.push(`/${query}`)
   }
 
   loadMore() {
-    let { data, location } = this.props
+    let { data, location } = this.props;
     data.fetchMore({
       query: query,
       variables: {
@@ -39,8 +39,8 @@ class ListView extends React.Component {
         endCursor: data.allMessages.pageInfo.endCursor,
       },
       updateQuery: (prev, next) => {
-        const newEdges = next.fetchMoreResult.allMessages.edges
-        const pageInfo = next.fetchMoreResult.allMessages.pageInfo
+        const newEdges = next.fetchMoreResult.allMessages.edges;
+        const pageInfo = next.fetchMoreResult.allMessages.pageInfo;
         return {
           allMessages: {
             edges: [...prev.allMessages.edges, ...newEdges],
@@ -52,7 +52,7 @@ class ListView extends React.Component {
   }
 
   render() {
-    let { data } = this.props
+    let { data } = this.props;
     if (data.loading || !data.allMessages) {
       return <div>Loading...</div>
     }
@@ -86,7 +86,7 @@ const queryOptions = {
       endCursor: null,
     },
   }),
-}
+};
 
-ListView = graphql(query, queryOptions)(ListView)
+ListView = graphql(query, queryOptions)(ListView);
 export default ListView

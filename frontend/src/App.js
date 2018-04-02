@@ -11,6 +11,7 @@ import DetailView from './views/DetailView'
 import ListView from './views/ListView'
 import LoginView from './views/LoginView'
 import LogoutView from './views/LogoutView'
+import TestsView from './views/tests/ListView'
 
 import './App.css';
 import {BatchHttpLink} from "apollo-link-batch-http/lib/index";
@@ -38,12 +39,14 @@ class App extends Component {
                         <ul>
                             <li><Link to="/">Home</Link></li>
                             <li><Link to="/messages/create/">Create Message</Link></li>
+                            <li><Link to="/tests/">Tests</Link></li>
                             <li><Link to="/login/">Login</Link></li>
                             <li><Link to="/logout/">Logout</Link></li>
                         </ul>
                         <Route exact path="/" component={ListView}/>
                         <Route exact path="/login/" component={LoginView}/>
                         <Route exact path="/logout/" component={LogoutView}/>
+                        <Route exact path="/tests/" component={TestsView}/>
                         <Switch>
                             <Route path="/messages/create/" component={CreateView}/>
                             <Route path="/messages/:id/" component={DetailView}/>

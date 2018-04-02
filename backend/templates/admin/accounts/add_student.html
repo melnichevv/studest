@@ -1,0 +1,38 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls admin_static admin_modify %}
+
+{% if not is_popup %}
+    {% block breadcrumbs %}
+{#        <nav id="grp-breadcrumbs">#}
+{#            <ul>#}
+{#                <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>#}
+{#                <li><a href="{% url 'admin:app_list' app_label='schedule' %}">Schedule</a></li>#}
+{#                <li><a href="{% url 'admin:schedule_venuepricingrule_changelist' %}">Partner Pricing Rules</a></li>#}
+{#                <li>Add Multiple Partner Pricing Rules</li>#}
+{#            </ul>#}
+{##}
+{#        </nav>#}
+    {% endblock %}
+{% endif %}
+
+{% block javascripts %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        <header id="grp-content-title">
+            <h1>Add Student</h1>
+        </header>
+        <form action="" method="post">{% csrf_token %}
+            {% if errors %}
+                <p class="errornote">{% if errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}
+                    {% trans "Please correct the errors below." %}{% endif %}</p>
+                <ul class="errorlist">{% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+            {{ form.as_p }}
+            <input type="submit" value="{% trans 'Save' %}"/>
+        </form>
+    </div>
+{% endblock %}

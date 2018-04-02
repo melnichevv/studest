@@ -1,5 +1,4 @@
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
 import json
 
 import graphene
@@ -7,6 +6,7 @@ from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
 
+from users.models import User
 from . import models
 
 
@@ -19,7 +19,7 @@ class MessageType(DjangoObjectType):
     class Meta:
         model = models.Message
         filter_fields = {'message': ['icontains']}
-        interfaces = (graphene.Node, )
+        interfaces = (graphene.Node,)
 
 
 class CreateMessageMutation(graphene.Mutation):
@@ -59,7 +59,6 @@ class Query(object):
     message = graphene.Field(MessageType,
                              id=graphene.ID(),
                              message=graphene.String())
-
 
     def resolve_all_messages(self, info, **kwargs):
         return models.Message.objects.all()

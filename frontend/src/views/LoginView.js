@@ -2,8 +2,8 @@ import React from 'react'
 
 export default class LoginView extends React.Component {
     handleSubmit(e) {
-        e.preventDefault()
-        let data = new FormData(this.form)
+        e.preventDefault();
+        let data = new FormData(this.form);
         fetch('http://0.0.0.0:8000/api-token-auth/', {
             method: 'POST',
             body: data,
@@ -11,7 +11,10 @@ export default class LoginView extends React.Component {
             .then(res => {
                 res.json().then(res => {
                     if (res.token) {
-                        localStorage.setItem('token', res.token)
+                        localStorage.setItem('token', res.token);
+                        if (res.user) {
+                            localStorage.setItem('user', JSON.stringify(res.user));
+                        }
                         window.location.replace('/')
                     }
                 })

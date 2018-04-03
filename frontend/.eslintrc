@@ -1,5 +1,5 @@
 {
-    "extends": ["eslint:recommended", "prettier", "prettier/react"],
+    "extends": ["eslint:recommended", "plugin:react/recommended", "prettier", "prettier/react"],
     "env": {
         "browser": true,
         "commonjs": true,

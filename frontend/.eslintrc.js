@@ -1,5 +1,9 @@
-{
-    "extends": ["eslint:recommended", "plugin:react/recommended", "prettier", "prettier/react"],
+module.exports = {
+    "extends": [
+        "prettier",
+        "prettier/react",
+        "eslint:recommended"
+    ],
     "env": {
         "browser": true,
         "commonjs": true,
@@ -22,6 +26,7 @@
     "rules": {
         "curly": [1, "multi-line"],
         "guard-for-in": 1,
+        // "indent": ["error", 4],
         "jsx-quotes": [2, "prefer-double"],
         "max-len": [0, 150, 4],
         "no-bitwise": 1,
@@ -49,7 +54,24 @@
         "react/self-closing-comp": 1,
         "semi": [1, "always"],
         "strict": [1, "safe"],
-        "vars-on-top": 0
+        "vars-on-top": 0,
+        "graphql/template-strings": ["error", {
+            // Import default settings for your GraphQL client. Supported values:
+            // "apollo", "relay", "lokka", "literal"
+            env: "apollo",
+
+            // Import your schema JSON here
+            // schemaJson: require("./schema.graphql"),
+            projectName: "studest",
+
+            // OR provide absolute path to your schema JSON
+            // schemaJsonFilepath: path.resolve(__dirname, "./schema.json"),
+
+            // OR provide the schema in the Schema Language format
+            // schemaString: printSchema(schema),
+
+            // tagName is gql by default
+        }]
     },
 
     "parserOptions": {
@@ -78,13 +100,14 @@
       ]
       // The names of any functions used to wrap the
       // propTypes object, e.g. `forbidExtraProps`.
-      // If this isn't set, any propTypes wrapped in
+      // If this isn"t set, any propTypes wrapped in
       // a function will be skipped.
     },
 
     "plugins": [
         "jasmine",
         "react",
-        "prettier"
+        "prettier",
+        "graphql"
     ]
-}
+};

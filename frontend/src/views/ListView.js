@@ -1,33 +1,34 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag';
-import queryString from 'query-string'
+import React from "react";
+import { Link } from "react-router-dom";
+import { graphql } from "react-apollo";
+import gql from "graphql-tag";
+import queryString from "query-string";
 
 export const query = gql`
-query ListViewSearch($search: String, $endCursor: String) {
-  allMessages(first: 2, message_Icontains: $search, after: $endCursor) {
-    edges {
-      node {
-        id, message
+  query ListViewSearch($search: String, $endCursor: String) {
+    allMessages(first: 2, message_Icontains: $search, after: $endCursor) {
+      edges {
+        node {
+          id
+          message
+        }
       }
-    },
-    pageInfo {
-      hasNextPage,
-      hasPreviousPage,
-      startCursor,
-      endCursor
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
     }
   }
-}
 `;
 
 class ListView extends React.Component {
   handleSearchSubmit(e) {
     e.preventDefault();
     let data = new FormData(this.form);
-    let query = `?search=${data.get('search')}`;
-    this.props.history.push(`/${query}`)
+    let query = `?search=${data.get("search")}`;
+    this.props.history.push(`/${query}`);
   }
 
   loadMore() {
@@ -36,7 +37,7 @@ class ListView extends React.Component {
       query: query,
       variables: {
         search: queryString.parse(location.search).search,
-        endCursor: data.allMessages.pageInfo.endCursor,
+        endCursor: data.allMessages.pageInfo.endCursor
       },
       updateQuery: (prev, next) => {
         const newEdges = next.fetchMoreResult.allMessages.edges;
@@ -44,17 +45,17 @@ class ListView extends React.Component {
         return {
           allMessages: {
             edges: [...prev.allMessages.edges, ...newEdges],
-            pageInfo,
-          },
-        }
-      },
-    })
+            pageInfo
+          }
+        };
+      }
+    });
   }
 
   render() {
     let { data } = this.props;
     if (data.loading || !data.allMessages) {
-      return <div>Loading...</div>
+      return <div>Loading...</div>;
     }
     return (
       <div>
@@ -67,15 +68,14 @@ class ListView extends React.Component {
         </form>
         {data.allMessages.edges.map(item => (
           <p key={item.node.id}>
-            <Link to={`/messages/${item.node.id}/`}>
-              {item.node.message}
-            </Link>
+            <Link to={`/messages/${item.node.id}/`}>{item.node.message}</Link>
           </p>
         ))}
-        {data.allMessages.pageInfo.hasNextPage &&
-          <button onClick={() => this.loadMore()}>Load more...</button>}
+        {data.allMessages.pageInfo.hasNextPage && (
+          <button onClick={() => this.loadMore()}>Load more...</button>
+        )}
       </div>
-    )
+    );
   }
 }
 
@@ -83,10 +83,11 @@ const queryOptions = {
   options: props => ({
     variables: {
       search: queryString.parse(props.location.search).search,
-      endCursor: null,
-    },
-  }),
+      endCursor: null
+    }
+  })
 };
 
+// eslint-disable-next-line no-class-assign
 ListView = graphql(query, queryOptions)(ListView);
-export default ListView
+export default ListView;

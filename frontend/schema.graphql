@@ -1,0 +1,106 @@
+schema {
+  query: Queries
+  mutation: Mutations
+}
+
+type CreateMessageMutation {
+  status: Int
+  formErrors: String
+  message: MessageType
+}
+
+type CreateTestMutation {
+  status: Int
+  formErrors: String
+  message: TestType
+}
+
+scalar DateTime
+
+type MessageType implements Node {
+  id: ID!
+  user: UserType!
+  message: String!
+  creationDate: DateTime!
+}
+
+type MessageTypeConnection {
+  pageInfo: PageInfo!
+  edges: [MessageTypeEdge]!
+}
+
+type MessageTypeEdge {
+  node: MessageType
+
+  cursor: String!
+}
+
+type Mutations {
+  createTest(message: String): CreateTestMutation
+  createMessage(message: String): CreateMessageMutation
+}
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+
+  hasPreviousPage: Boolean!
+
+  startCursor: String
+
+  endCursor: String
+}
+
+type Queries {
+  allTests(before: String, after: String, first: Int, last: Int, name_Icontains: String): TestTypeConnection
+  test(id: ID, name: String): TestType
+  allMessages(before: String, after: String, first: Int, last: Int, message_Icontains: String): MessageTypeConnection
+  currentUser(id: Int, name: String): UserType
+  message(id: ID, message: String): MessageType
+}
+
+type TestType implements Node {
+  id: ID!
+  created: DateTime!
+  modified: DateTime!
+  uuid: UUID!
+  name: String
+  minutes: Int
+  description: String
+}
+
+type TestTypeConnection {
+  pageInfo: PageInfo!
+  edges: [TestTypeEdge]!
+}
+
+type TestTypeEdge {
+  node: TestType
+
+  cursor: String!
+}
+
+type UserType {
+  id: ID!
+  password: String!
+  lastLogin: DateTime
+
+  isSuperuser: Boolean!
+
+  username: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+
+  isStaff: Boolean!
+
+  isActive: Boolean!
+  dateJoined: DateTime!
+  lastVisitedAt: DateTime
+  messageSet(before: String, after: String, first: Int, last: Int, message_Icontains: String): MessageTypeConnection
+}
+
+scalar UUID

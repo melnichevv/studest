@@ -29,6 +29,13 @@ export const query = gql`
 `;
 
 class ListView extends React.Component {
+    componentWillMount() {
+        // Redirect user to login page, if he/she is not authorized (doesn't have token)
+        if (!localStorage.token) {
+            window.location.replace('/login');
+        }
+    }
+
     handleSearchSubmit(e) {
         e.preventDefault();
         let data = new FormData(this.form);

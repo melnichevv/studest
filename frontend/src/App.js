@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Nav, NavItem, NavLink} from 'reactstrap';
 import {BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom';
 
 import {ApolloClient} from 'apollo-client';
@@ -29,6 +30,9 @@ const client = new ApolloClient({
     connectToDevTools: true,
 });
 console.warn('client', client);
+console.warn('localStorage', localStorage);
+
+const token = localStorage.token;
 
 class App extends Component {
     render() {
@@ -36,13 +40,29 @@ class App extends Component {
             <ApolloProvider client={client}>
                 <Router>
                     <div>
-                        <ul>
-                            <li><Link to="/">Home</Link></li>
-                            <li><Link to="/messages/create/">Create Message</Link></li>
-                            <li><Link to="/tests/">Tests</Link></li>
-                            <li><Link to="/login/">Login</Link></li>
-                            <li><Link to="/logout/">Logout</Link></li>
-                        </ul>
+                        <Nav>
+                            <NavItem>
+                                <NavLink href="/">Home</NavLink>
+                            </NavItem>
+                            {
+                                token &&
+                                <NavItem>
+                                    <NavLink href="/tests/">Tests</NavLink>
+                                </NavItem>
+                            }
+                            {
+                                token &&
+                                <NavItem>
+                                    <NavLink href="/logout">Logout</NavLink>
+                                </NavItem>
+                            }
+                            {
+                                !token &&
+                                <NavItem>
+                                    <NavLink href="/login">Login</NavLink>
+                                </NavItem>
+                            }
+                        </Nav>
                         <Route exact path="/" component={ListView}/>
                         <Route exact path="/login/" component={LoginView}/>
                         <Route exact path="/logout/" component={LogoutView}/>

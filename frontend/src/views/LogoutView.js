@@ -2,8 +2,8 @@ import React from 'react'
 
 export default class LogoutView extends React.Component {
   handleClick() {
-    localStorage.removeItem('token')
-    window.location.replace('/')
+    localStorage.removeItem('token');
+    window.location.replace('/');
   }
 
   render() {

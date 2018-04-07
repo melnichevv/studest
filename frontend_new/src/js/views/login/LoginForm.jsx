@@ -3,14 +3,9 @@ import { connect } from 'react-redux';
 import { getFormValues, Field, reduxForm, formValueSelector } from 'redux-form';
 
 let LoginForm = (props) => {
-  console.warn('props in LoginForm', props);
   return (
     <form onSubmit={props.handleSubmit}>
       <div>
-        <div>
-          {props.isFetching && 'qwe' }
-          {!props.isFetching && 'asd' }
-        </div>
         <label>Username:</label>
         <Field
           name="username"

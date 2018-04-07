@@ -9,6 +9,7 @@ class Header extends PureComponent {
 
     const isHome = pathname === '/';
     const isJustAnotherPage = pathname === '/page';
+    const isLoginPage = pathname === '/login';
 
     return (
       <header className="globalHeader">
@@ -24,6 +25,12 @@ class Header extends PureComponent {
             {
               isJustAnotherPage ?
                 'Just Another Page' : <Link to="/page">Just Another Page</Link>
+            }
+          </li>
+          <li className={!isLoginPage ? 'active' : ''}>
+            {
+              isLoginPage ?
+                'Login' : <Link to="/login">Log in</Link>
             }
           </li>
         </ul>

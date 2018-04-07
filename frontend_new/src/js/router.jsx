@@ -6,7 +6,7 @@ import { syncHistoryWithStore } from 'react-router-redux';
 
 import routes from './routes';
 import Root from './Root';
-import configureStore from './redux/configureStore';
+import { configureStore } from './store/configureStore';
 
 let initialState = {};
 

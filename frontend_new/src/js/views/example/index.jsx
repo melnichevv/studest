@@ -28,7 +28,7 @@ const mapDispatchToProps = {
 class ExampleView extends Component {
   static propTypes = {
     example: PropTypes.object.isRequired,
-  }
+  };
 
   componentDidMount() {
     this.props.getAwesomeCode();
@@ -42,7 +42,7 @@ class ExampleView extends Component {
           <ExampleWithError {...this.props} />
         </ErrorBoundary>
       </Fragment>
-    )
+    );
   }
 }
 

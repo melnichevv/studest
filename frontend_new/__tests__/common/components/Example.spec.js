@@ -12,7 +12,7 @@ const fixture = {
   },
 };
 
-describe('ExampleView', () => {
+describe('LoginView', () => {
   it('should render a blank div without data', () => {
     const el = shallow(<Example />)
 

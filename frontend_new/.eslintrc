@@ -18,9 +18,10 @@
   },
   // Rule changes from Airbnb's eslint config
   "rules": {
+    "jsx-quotes": [2, "prefer-double"],
     "import/no-unresolved": 0,
     "new-cap": 0,
-    "semi": 0,
+    "semi": [1, "always"],
     "global-require": 0,
     "no-underscore-dangle": 0,
     "arrow-body-style": 0,

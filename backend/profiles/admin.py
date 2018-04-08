@@ -18,7 +18,7 @@ class StudentProfileAdmin(ModelAdmin):
         'created_at'
     )
     list_display = (
-        'name_display',
+        # 'user__get_full_name',
         'date_registered',
         'last_visited_at'
     )
@@ -37,16 +37,16 @@ class StudentProfileAdmin(ModelAdmin):
         """Return the date_joined of the underlying user."""
         return obj.user.date_joined
 
-    def name_display(self, obj: StudentProfile):
-        """Format the user for display: First Last (impersonate)"""
-        safe_name = bleach_clean(obj.user.get_full_name())
-        link = "%s (<a href='%s' target='_blank'>impersonate</a>)" % (
-            safe_name,
-            reverse('impersonate-start', args=[obj.user.id]),
-        )
-        return mark_safe(link)
+    # def name_display(self, obj: StudentProfile):
+    #     """Format the user for display: First Last (impersonate)"""
+    #     safe_name = bleach_clean(obj.user.get_full_name())
+    #     link = "%s (<a href='%s' target='_blank'>impersonate</a>)" % (
+    #         safe_name,
+    #         reverse('impersonate-start', args=[obj.user.id]),
+    #     )
+    #     return mark_safe(link)
 
-    name_display.short_description = _("Full Name")
+    # name_display.short_description = _("Full Name")
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -63,7 +63,7 @@ class StudentProfileAdmin(ModelAdmin):
             return _('Never')
         return obj.user.last_visited_at
 
-    name_display.short_description = _("Last Visited At")
+    last_visited_at.short_description = _("Last Visited At")
 
 
 admin.site.register(StudentProfile, StudentProfileAdmin)
@@ -78,7 +78,7 @@ class TeacherProfileAdmin(ModelAdmin):
         'created_at'
     )
     list_display = (
-        'name_display',
+        # 'user__get_full_name',
         'date_registered',
         'last_visited_at'
     )
@@ -97,16 +97,16 @@ class TeacherProfileAdmin(ModelAdmin):
         """Return the date_joined of the underlying user."""
         return obj.user.date_joined
 
-    def name_display(self, obj: TeacherProfile):
-        """Format the user for display: First Last (impersonate)"""
-        safe_name = bleach_clean(obj.user.get_full_name())
-        link = "%s (<a href='%s' target='_blank'>impersonate</a>)" % (
-            safe_name,
-            reverse('impersonate-start', args=[obj.user.id]),
-        )
-        return mark_safe(link)
-
-    name_display.short_description = _("Full Name")
+    # def name_display(self, obj: TeacherProfile):
+    #     """Format the user for display: First Last (impersonate)"""
+    #     safe_name = bleach_clean(obj.user.get_full_name())
+    #     link = "%s (<a href='%s' target='_blank'>impersonate</a>)" % (
+    #         safe_name,
+    #         reverse('impersonate-start', args=[obj.user.id]),
+    #     )
+    #     return mark_safe(link)
+    #
+    # name_display.short_description = _("Full Name")
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -123,7 +123,7 @@ class TeacherProfileAdmin(ModelAdmin):
             return _('Never')
         return obj.user.last_visited_at
 
-    name_display.short_description = _("Last Visited At")
+    last_visited_at.short_description = _("Last Visited At")
 
 
 admin.site.register(TeacherProfile, TeacherProfileAdmin)

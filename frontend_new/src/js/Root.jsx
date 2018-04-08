@@ -7,6 +7,7 @@ import {setContext} from 'apollo-link-context';
 import {BatchHttpLink} from 'apollo-link-batch-http/lib/index';
 import ApolloProvider from 'react-apollo/ApolloProvider';
 import {Provider} from 'react-redux';
+import 'bootstrap/dist/css/bootstrap.css';
 
 const middlewareLink = setContext(() => ({
   headers: {

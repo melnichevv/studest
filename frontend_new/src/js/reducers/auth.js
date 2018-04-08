@@ -1,4 +1,4 @@
-import { LOGIN, LOGIN_FAILED } from '../constants/ActionTypes';
+import { LOGIN, LOGIN_FAILED, UNAUTHORIZE } from '../constants/ActionTypes';
 
 export const loginUser = function (state, action) {
   console.warn('loginUser', state);
@@ -21,11 +21,19 @@ export const loginFailed = function (state, action) {
   });
 };
 
+export const unsetCurrentUser = function (state, action) {
+  return Object.assign({}, state, {
+    token: null,
+    user: null,
+  });
+};
+
 
 export default function app(state = {}, action = {}) {
   const types = {
     [LOGIN]: loginUser,
     [LOGIN_FAILED]: loginFailed,
+    [UNAUTHORIZE]: unsetCurrentUser,
   };
 
   if (action.type in types) {

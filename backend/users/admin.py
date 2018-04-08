@@ -10,8 +10,8 @@ from users.models import User
 
 class UserAdmin(ModelAdmin):
     list_display = (
-        # 'get_full_name',
-        'name_display',
+        'get_full_name',
+        # 'name_display',
         'last_visited_at',
         'date_registered',
     )
@@ -40,16 +40,16 @@ class UserAdmin(ModelAdmin):
         """Return the date_joined of the underlying user."""
         return obj.date_joined
 
-    def name_display(self, obj: User):
-        """Format the user for display: First Last (impersonate)"""
-        safe_name = bleach_clean(obj.get_full_name())
-        link = "%s (<a href='%s' target='_blank'>impersonate</a>)" % (
-            safe_name,
-            reverse('impersonate-start', args=[obj.id]),
-        )
-        return mark_safe(link)
-
-    name_display.short_description = _("Full Name")
+    # def name_display(self, obj: User):
+    #     """Format the user for display: First Last (impersonate)"""
+    #     safe_name = bleach_clean(obj.get_full_name())
+    #     link = "%s (<a href='%s' target='_blank'>impersonate</a>)" % (
+    #         safe_name,
+    #         reverse('impersonate-start', args=[obj.id]),
+    #     )
+    #     return mark_safe(link)
+    #
+    # name_display.short_description = _("Full Name")
 
     def get_fieldsets(self, request, obj=None):
         """

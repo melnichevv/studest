@@ -1,4 +1,4 @@
-import { LOGIN, LOGIN_FAILED } from '../constants/ActionTypes';
+import { LOGIN, LOGIN_FAILED, UNAUTHORIZE } from '../constants/ActionTypes';
 import { fetchData, finishFetchData } from './coreActions';
 
 export function processLogin(token, user) {
@@ -46,5 +46,20 @@ export function login(params, history) {
     }
 
     dispatch(finishFetchData());
+  };
+}
+
+
+export function unsetCurrentUser() {
+  return {
+    type: UNAUTHORIZE,
+  };
+}
+
+export function logout(history) {
+  return (dispatch, getState) => {
+    history.push('/');
+
+    dispatch(unsetCurrentUser());
   };
 }

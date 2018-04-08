@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import {
-  Button,
   Collapse,
   Navbar,
   NavbarToggler,
@@ -18,7 +17,6 @@ import {
   DropdownItem
 } from 'reactstrap';
 import * as logout from '../../../actions/authActions';
-// import './Header.css';
 
 const mapStateToProps = state => ({
   ...state,
@@ -51,10 +49,11 @@ class Header extends PureComponent {
     });
   }
 
+  logout() {
+    this.props.logout(this.props.history);
+  }
+
   render() {
-    console.warn(this.props);
-    console.warn(!this.props.auth.token);
-    console.warn(!!this.props.auth.token);
     return (
       <div>
         <Navbar color="light" light expand="md">
@@ -63,7 +62,7 @@ class Header extends PureComponent {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               {
-                !this.props.auth.token &&
+                !!this.props.auth.token &&
                 <NavItem>
                   <NavLink tag={Link} to="/tests/">Tests</NavLink>
                 </NavItem>
@@ -77,7 +76,7 @@ class Header extends PureComponent {
               { !!this.props.auth.token &&
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret>
-                    { this.props.auth.user ? this.props.auth.user.get_full_name : 'Profile' }
+                    { this.props.auth.user ? `Hello, ${this.props.auth.user.first_name}` : 'Profile' }
                   </DropdownToggle>
                   <DropdownMenu right>
                     <DropdownItem>
@@ -87,7 +86,7 @@ class Header extends PureComponent {
                       Option 2
                     </DropdownItem>
                     <DropdownItem divider />
-                    <DropdownItem onClick={this.props.logout(this.props.history)}>
+                    <DropdownItem onClick={this.logout.bind(this)}>
                       Logout
                     </DropdownItem>
                   </DropdownMenu>
@@ -99,54 +98,6 @@ class Header extends PureComponent {
       </div>
     );
   }
-
-  // render() {
-  //   const { pathname } = this.props.location;
-  //   console.warn('props in header', this.props);
-  //
-  //   const isHome = pathname === '/';
-  //   const isJustAnotherPage = pathname === '/page';
-  //   const isLoginPage = pathname === '/login';
-  //   const isLogoutPage = pathname === '/logout';
-  //
-  //   return (
-  //     <header className="globalHeader">
-  //       <ul>
-  //         <li className={!isHome ? 'active' : ''}>
-  //           {
-  //             isHome ?
-  //               'Home' : <Link to="/">Home</Link>
-  //
-  //           }
-  //         </li>
-  //         <li className={!isJustAnotherPage ? 'active' : ''}>
-  //           {
-  //             isJustAnotherPage ?
-  //               'Just Another Page' : <Link to="/page">Just Another Page</Link>
-  //           }
-  //         </li>
-  //         {
-  //           !!this.props.auth.token &&
-  //           <li className={!isLoginPage ? 'active' : ''}>
-  //             {
-  //               isLoginPage ?
-  //                 'Login' : <Link to="/login">Log in</Link>
-  //             }
-  //           </li>
-  //         }
-  //         {
-  //           !this.props.auth.token &&
-  //           <li className={!isLogoutPage ? 'active' : ''}>
-  //             {
-  //               isLogoutPage ?
-  //                 'Logout' : <Button color='link' onClick={this.props.unsetCurrentUser}>Log out</Button>
-  //             }
-  //           </li>
-  //         }
-  //       </ul>
-  //     </header>
-  //   );
-  // }
 }
 
 export default Header;

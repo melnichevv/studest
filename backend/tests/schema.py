@@ -57,15 +57,15 @@ class Query(object):
     test = graphene.Field(
         TestType,
         id=graphene.ID(),
+        uuid=graphene.String(),
         name=graphene.String()
     )
 
     def resolve_all_tests(self, info, **kwargs):
         return Test.objects.all()
 
-    def resolve_test(self, info, id):
-        rid = from_global_id(id)
-        return Test.objects.get(pk=rid[1])
+    def resolve_test(self, info, uuid):
+        return Test.objects.get(uuid=uuid)
 
     def resolve_current_user(self, info, **kwargs):
         context = info.context

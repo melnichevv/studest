@@ -32,7 +32,6 @@ class LoginView extends Component {
     console.warn(this.props);
     console.warn('this.props');
     return this.props.login(this.props.form.login.values, this.props.history);
-    // return reduxFormSubmitAction(this.props.login, data);
   };
 
   render() {

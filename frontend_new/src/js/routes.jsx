@@ -9,6 +9,7 @@ import { Header } from './common/components/Header';
 import '../assets/fonts/fonts.css';
 import LoginView from './views/login';
 import TestsView from './views/tests';
+import TestDetailsView from './views/tests/TestDetailsView';
 
 
 const HeaderWithRouter = withRouter(props => <Header {...props} />);
@@ -20,6 +21,7 @@ module.exports = (
     <div className="container__content">
       <Switch>
         <Route path="/login" component={LoginView} />
+        <Route path="/tests/:uuid/details/" component={TestDetailsView} />
         <Route path="/tests" component={TestsView} />
       </Switch>
     </div>

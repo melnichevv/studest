@@ -1,12 +1,11 @@
 import React, { Component, Fragment } from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import queryString from 'query-string';
-import * as login from '../../actions/authActions';
+
+import SearchForm from '../core/SearchForm';
 
 export const query = gql`
   query ListViewSearch($search: String, $endCursor: String) {
@@ -39,30 +38,30 @@ const mapStateToProps = state => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    ...bindActionCreators(login, dispatch),
+    // ...bindActionCreators(login, dispatch),
   };
 }
 
 @connect(mapStateToProps, mapDispatchToProps)
 class TestsView extends Component {
   static propTypes = {
-    login: PropTypes.func.isRequired,
-    isFetching: PropTypes.bool.isRequired,
   };
 
   componentDidMount() {
     // this.props.getAwesomeCode();
   }
+
   handleSubmit = (data, dispatch, form) => {
     console.warn('handleSubmit', data, dispatch, form);
-    console.warn(this.props);
-    console.warn('this.props');
-    return this.props.login(this.props.form.login.values, this.props.history);
-    // return reduxFormSubmitAction(this.props.login, data);
+    console.warn('handleSubmit', this.props);
+    const formData = this.props.form.search.values;
+    const searchQuery = `?search=${formData ? formData.search : ''}`;
+    this.props.history.push(`/tests/${searchQuery}`);
   };
 
   render() {
     const { data } = this.props;
+    const initialSearch = queryString.parse(this.props.location.search).search;
     if (data.loading || !data.allTests) {
       return <div>Loading...</div>;
     }
@@ -70,16 +69,10 @@ class TestsView extends Component {
       <Fragment>
         <h1>Tests</h1>
         <div>
-          {/*<form*/}
-            {/*ref={ref => (this.form = ref)}*/}
-            {/*onSubmit={e => this.handleSearchSubmit(e)}*/}
-          {/*>*/}
-            {/*<input type="text" name="search" />*/}
-            {/*<button type="submit">Search</button>*/}
-          {/*</form>*/}
+          <SearchForm onSubmit={this.handleSubmit} initialValues={initialSearch} />
           {data.allTests.edges.map(item => (
             <p key={item.node.id}>
-              <Link to={`/tests/${item.node.uuid}/`}>{item.node.name}</Link>
+              <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.name}</Link>
             </p>
           ))}
           {data.allTests.pageInfo.hasNextPage && (
@@ -99,7 +92,7 @@ const queryOptions = {
       endCursor: null,
     },
   }),
-}
+};
 
 // eslint-disable-next-line no-class-assign
 TestsView = graphql(query, queryOptions)(TestsView);

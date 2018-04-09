@@ -5,9 +5,8 @@ import graphene
 from graphene import String, Int
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
-from graphql_relay.node.node import from_global_id
 
-from tests.models import Test
+from tests.models import Test, Question
 
 
 class TestType(DjangoObjectType):
@@ -18,6 +17,21 @@ class TestType(DjangoObjectType):
     class Meta:
         model = Test
         filter_fields = {'name': ['icontains']}
+        interfaces = (graphene.Node,)
+
+
+class QuestionType(DjangoObjectType):
+    type = String()
+    question = String()
+    video_url = String()
+    img_url = String()
+    audio_url = String()
+    other_url = String()
+    # labels = ''
+
+    class Meta:
+        model = Question
+        filter_fields = {'type': ['exact']}
         interfaces = (graphene.Node,)
 
 
@@ -60,9 +74,13 @@ class Query(object):
         uuid=graphene.String(),
         name=graphene.String()
     )
+    test_questions = DjangoFilterConnectionField(QuestionType)
 
     def resolve_all_tests(self, info, **kwargs):
         return Test.objects.all()
+
+    def resolve_test_questions(self, info, **kwargs):
+        return Question.objects.all()
 
     def resolve_test(self, info, uuid):
         return Test.objects.get(uuid=uuid)

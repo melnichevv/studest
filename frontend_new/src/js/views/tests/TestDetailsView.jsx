@@ -9,6 +9,19 @@ export const query = gql`
       name
       description
       minutes
+      questions {
+        edges {
+          node {
+            id
+            type
+            question
+            imgUrl
+            videoUrl
+            audioUrl
+            otherUrl
+          }
+        }
+      }
     }
   }
 `;
@@ -37,6 +50,16 @@ class TestDetailsView extends Component {
         <h1>Test "{data.test.name}"</h1>
         <p>Time allowed: {data.test.minutes}</p>
         <p>Description: {data.test.description}</p>
+        {data.test.questions.edges.map(item => (
+          <p key={item.node.id}>
+            <p>Type: {item.node.type}</p>
+            <p>Question: {item.node.question}</p>
+            {item.node.imgUrl ? <p>Image URL: {item.node.imgUrl}</p> : ''}
+            {item.node.audioUrl ? <p>Audio URL: {item.node.audioUrl}</p> : ''}
+            {item.node.videoURL ? <p>Video URL: {item.node.videoUrl}</p> : ''}
+            {item.node.otherURL ? <p>Other URL: {item.node.otherURL}</p> : ''}
+          </p>
+        ))}
       </div>
     );
   }

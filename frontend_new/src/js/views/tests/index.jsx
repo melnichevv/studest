@@ -69,8 +69,31 @@ class TestsView extends Component {
       if (this.props.core.search !== initialSearch) {
         this.props.coreActions.saveSearch(initialSearch);
       }
-      return <div>Loading...</div>;
+      return (
+        <Fragment>
+          <h1>Tests</h1>
+          <div>
+            <SearchForm onSubmit={this.handleSubmit} />
+            <Table striped>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Time allowed</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th colSpan={4}>Loading...</th>
+                </tr>
+              </tbody>
+            </Table>
+          </div>
+        </Fragment>
+      );
     }
+    console.warn(data.allTests, data.allTests.edges.length);
     return (
       <Fragment>
         <h1>Tests</h1>
@@ -86,7 +109,7 @@ class TestsView extends Component {
               </tr>
             </thead>
             <tbody>
-              {data.allTests.edges.map(item => (
+              {data.allTests.edges.length > 0 && data.allTests.edges.map(item => (
                 <tr key={item.node.id}>
                   <td>
                     <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.name}</Link>
@@ -96,6 +119,14 @@ class TestsView extends Component {
                   <td>{item.node.created}</td>
                 </tr>
               ))}
+              {
+                data.allTests.edges.length === 0 &&
+                <tr>
+                  <td colSpan={4}>
+                    No tests
+                  </td>
+                </tr>
+              }
             </tbody>
           </Table>
           {data.allTests.pageInfo.hasNextPage && (

@@ -31,6 +31,9 @@ SearchForm = connect((state) => {
   return {
     formValues,
     search,
+    initialValues: {
+      search: state.core.search,
+    },
   };
 })(SearchForm);
 

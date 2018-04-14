@@ -5,6 +5,8 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import queryString from 'query-string';
 import { Table } from 'reactstrap';
+import { bindActionCreators } from 'redux';
+import * as core from '../../actions/coreActions';
 
 import SearchForm from '../core/SearchForm';
 
@@ -39,7 +41,7 @@ const mapStateToProps = state => ({
 
 function mapDispatchToProps(dispatch) {
   return {
-    // ...bindActionCreators(login, dispatch),
+    coreActions: bindActionCreators(core, dispatch),
   };
 }
 
@@ -49,7 +51,8 @@ class TestsView extends Component {
   };
 
   componentDidMount() {
-    // this.props.getAwesomeCode();
+    const initialSearch = queryString.parse(this.props.location.search).search;
+    this.props.coreActions.saveSearch(initialSearch);
   }
 
   handleSubmit = (data, dispatch, form) => {
@@ -62,7 +65,6 @@ class TestsView extends Component {
 
   render() {
     const { data } = this.props;
-    const initialSearch = queryString.parse(this.props.location.search).search;
     if (data.loading || !data.allTests) {
       return <div>Loading...</div>;
     }
@@ -70,7 +72,7 @@ class TestsView extends Component {
       <Fragment>
         <h1>Tests</h1>
         <div>
-          <SearchForm onSubmit={this.handleSubmit} initialValues={initialSearch} />
+          <SearchForm onSubmit={this.handleSubmit} />
           <Table striped>
             <thead>
               <tr>

@@ -1,4 +1,4 @@
-import { FETCH_DATA, FINISH_FETCH_DATA } from '../constants/ActionTypes';
+import { FETCH_DATA, FINISH_FETCH_DATA, SAVE_SEARCH } from '../constants/ActionTypes';
 
 
 export function fetchData() {
@@ -10,5 +10,12 @@ export function fetchData() {
 export function finishFetchData() {
   return {
     type: FINISH_FETCH_DATA,
+  };
+}
+
+export function saveSearch(search) {
+  return {
+    type: SAVE_SEARCH,
+    search,
   };
 }

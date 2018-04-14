@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import queryString from 'query-string';
+import { Table } from 'reactstrap';
 
 import SearchForm from '../core/SearchForm';
 
@@ -70,11 +71,28 @@ class TestsView extends Component {
         <h1>Tests</h1>
         <div>
           <SearchForm onSubmit={this.handleSubmit} initialValues={initialSearch} />
-          {data.allTests.edges.map(item => (
-            <p key={item.node.id}>
-              <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.name}</Link>
-            </p>
-          ))}
+          <Table striped>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Time allowed</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.allTests.edges.map(item => (
+                <tr key={item.node.id}>
+                  <td>
+                    <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.name}</Link>
+                  </td>
+                  <td>{item.node.description}</td>
+                  <td>{item.node.minutes}m</td>
+                  <td>{item.node.created}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
           {data.allTests.pageInfo.hasNextPage && (
             <button onClick={() => this.loadMore()}>Load more...</button>
           )}

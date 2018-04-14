@@ -1,20 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { getFormValues, Field, reduxForm, formValueSelector } from 'redux-form';
+import './SearchForm.css';
 
 let SearchForm = (props) => {
   return (
-    <form onSubmit={props.handleSubmit}>
+    <form className="search-form" onSubmit={props.handleSubmit}>
       <div>
-        <label>Search:</label>
         <Field
           name="search"
           component="input"
           type="text"
           placeholder="Search for tests"
         />
+        <button type="submit">Search</button>
       </div>
-      <button type="submit">Search</button>
     </form>
   );
 };

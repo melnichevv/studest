@@ -73,6 +73,7 @@ class Test(UuidMixin, TimeStampedModel):
     minutes = models.IntegerField(_('allowed time'), default=0, help_text=_('Allowed time for fulfilling the test'))
     labels = models.ManyToManyField(Label, verbose_name=Label._meta.verbose_name_plural, blank=True)
     description = models.TextField(_('description'), null=True, blank=True)
+    start_at = models.DateTimeField(_('start at'))
 
     class Meta:
         verbose_name = _('test')

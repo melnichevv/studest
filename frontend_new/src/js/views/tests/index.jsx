@@ -9,6 +9,7 @@ import { bindActionCreators } from 'redux';
 import * as core from '../../actions/coreActions';
 
 import SearchForm from '../core/SearchForm';
+import processDate from '../../utils/date';
 
 export const query = gql`
   query ListViewSearch($search: String, $endCursor: String) {
@@ -19,6 +20,7 @@ export const query = gql`
           name
           description
           created
+          startAt
           minutes
           uuid
         }
@@ -66,9 +68,9 @@ class TestsView extends Component {
     if (data.loading || !data.allTests) {
       const initialSearch = queryString.parse(this.props.location.search).search;
       /* TODO This causes a warning of bad code. Fixme */
-      if (this.props.core.search !== initialSearch) {
-        this.props.coreActions.saveSearch(initialSearch);
-      }
+      // if (this.props.core.search !== initialSearch) {
+      //   this.props.coreActions.saveSearch(initialSearch);
+      // }
       return (
         <Fragment>
           <h1>Tests</h1>
@@ -79,13 +81,14 @@ class TestsView extends Component {
                 <tr>
                   <th>Name</th>
                   <th>Description</th>
+                  <th>Start at</th>
                   <th>Time allowed</th>
                   <th>Created</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <th colSpan={4}>Loading...</th>
+                  <th colSpan={5}>Loading...</th>
                 </tr>
               </tbody>
             </Table>
@@ -93,7 +96,6 @@ class TestsView extends Component {
         </Fragment>
       );
     }
-    console.warn(data.allTests, data.allTests.edges.length);
     return (
       <Fragment>
         <h1>Tests</h1>
@@ -104,6 +106,7 @@ class TestsView extends Component {
               <tr>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Start at</th>
                 <th>Time allowed</th>
                 <th>Created</th>
               </tr>
@@ -114,9 +117,18 @@ class TestsView extends Component {
                   <td>
                     <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.name}</Link>
                   </td>
-                  <td>{item.node.description}</td>
-                  <td>{item.node.minutes}m</td>
-                  <td>{item.node.created}</td>
+                  <td>
+                    {item.node.description}
+                  </td>
+                  <td>
+                    {processDate(item.node.startAt)}
+                  </td>
+                  <td>
+                    {item.node.minutes}m
+                  </td>
+                  <td>
+                    {processDate(item.node.created)}
+                  </td>
                 </tr>
               ))}
               {

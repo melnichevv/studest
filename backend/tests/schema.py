@@ -12,6 +12,7 @@ from tests.models import Test, Question
 class TestType(DjangoObjectType):
     name = String()
     minutes = Int()
+    start_at = String()
     description = String()
 
     class Meta:

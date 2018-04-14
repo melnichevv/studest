@@ -3,12 +3,15 @@ import { connect } from 'react-redux';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
+import processDate from '../../utils/date';
+
 export const query = gql`
   query DetailView($uuid: String!) {
     test(uuid: $uuid) {
       name
       description
       minutes
+      startAt
       questions {
         edges {
           node {
@@ -49,6 +52,7 @@ class TestDetailsView extends Component {
       <div>
         <h1>Test "{data.test.name}"</h1>
         <p>Time allowed: {data.test.minutes}</p>
+        <p>Start at: {processDate(data.test.startAt)}</p>
         <p>Description: {data.test.description}</p>
         {data.test.questions.edges.map(item => (
           <p key={item.node.id}>

@@ -55,9 +55,7 @@ class TestsView extends Component {
     this.props.coreActions.saveSearch(initialSearch);
   }
 
-  handleSubmit = (data, dispatch, form) => {
-    console.warn('handleSubmit', data, dispatch, form);
-    console.warn('handleSubmit', this.props);
+  handleSubmit = () => {
     const formData = this.props.form.search.values;
     const searchQuery = `?search=${formData ? formData.search : ''}`;
     this.props.history.push(`/tests/${searchQuery}`);
@@ -66,6 +64,11 @@ class TestsView extends Component {
   render() {
     const { data } = this.props;
     if (data.loading || !data.allTests) {
+      const initialSearch = queryString.parse(this.props.location.search).search;
+      /* TODO This causes a warning of bad code. Fixme */
+      if (this.props.core.search !== initialSearch) {
+        this.props.coreActions.saveSearch(initialSearch);
+      }
       return <div>Loading...</div>;
     }
     return (

@@ -29,6 +29,7 @@ export const query = gql`
             answers {
               edges {
                 node {
+                  id
                   text
                   correct
                 }
@@ -74,7 +75,7 @@ class TestDetailsView extends Component {
             {item.node.otherURL ? <p>Other URL: {item.node.otherURL}</p> : ''}
             {item.node.type === 'radio'}
             {
-              item.node.type === 'radio' && <RadioQuestion question={item.node} />
+              item.node.type === 'radio' && <RadioQuestion question={item.node} form={item.node.uuid} />
             }
             {
               item.node.type === 'checkbox' && <CheckboxQuestion question={item.node} />

@@ -39,6 +39,7 @@ export function login(params, history) {
     const responseBody = await response.json();
     console.warn('responseBody', responseBody);
     if (responseBody.token && responseBody.user) {
+      localStorage.setItem('token', responseBody.token);
       dispatch(processLogin(responseBody.token, responseBody.user));
       history.push('/');
     } else {
@@ -59,6 +60,7 @@ export function unsetCurrentUser() {
 export function logout(history) {
   return (dispatch, getState) => {
     history.push('/');
+    localStorage.removeItem('token');
 
     dispatch(unsetCurrentUser());
   };

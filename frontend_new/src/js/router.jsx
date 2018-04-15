@@ -8,7 +8,11 @@ import routes from './routes';
 import Root from './Root';
 import { configureStore } from './store/configureStore';
 
-const initialState = {};
+const initialState = {
+  core: {
+    isFetching: false,
+  },
+};
 
 // // rehydrate initialState for JS app
 // if (window.__INITIAL_STATE__) {
@@ -26,7 +30,6 @@ const initialState = {};
 const hashHistory = createHistory();
 
 const { store, persistor } = configureStore(initialState, hashHistory);
-console.warn(store, persistor);
 const history = syncHistoryWithStore(hashHistory, store);
 
 // Render the React application to the DOM

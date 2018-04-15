@@ -4,7 +4,6 @@ export const loginUser = function (state, action) {
   console.warn('loginUser', state);
   console.warn('loginUser', action);
   return Object.assign({}, state, {
-    isFetching: true,
     lastUpdated: Date.now(),
     token: action.token,
     user: action.user,

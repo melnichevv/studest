@@ -2,8 +2,9 @@ import graphene
 from graphene import String, Int, Boolean
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
-
-from tests.models import Test, Question, Answer
+from graphql_relay.node.node import from_global_id
+from tests.models import Test, Question, Answer, TestResult, QuestionAnswer
+from users.schema import UserType
 
 
 class TestType(DjangoObjectType):
@@ -42,6 +43,20 @@ class AnswerType(DjangoObjectType):
         interfaces = (graphene.Node,)
 
 
+class TestResultType(DjangoObjectType):
+
+    class Meta:
+        model = TestResult
+        interfaces = (graphene.Node,)
+
+
+class QuestionAnswerType(DjangoObjectType):
+
+    class Meta:
+        model = QuestionAnswer
+        interfaces = (graphene.Node,)
+
+
 class CreateTestMutation(graphene.Mutation):
     class Arguments:
         message = graphene.String()
@@ -68,8 +83,27 @@ class CreateTestMutation(graphene.Mutation):
         #     return CreateTestMutation(status=200, message=message)
 
 
+class CreateQuestionAnswerMutation(graphene.Mutation):
+    class Arguments:
+        answers = graphene.List(graphene.String)
+        question = graphene.String()
+
+    status = graphene.Int()
+    formErrors = graphene.String()
+    question = graphene.Field(QuestionType)
+    # answer = graphene.String()
+    # message = graphene.Field(TestType)
+
+    def mutate(self, info, answers, question):
+        answers = [from_global_id(x)[1] for x in answers]
+        question = Question.objects.get(uuid=question)
+        answers = Answer.objects.filter(question=question, id__in=answers)
+        current_user = info.context.user
+
+
 class Mutation(object):
     create_test = CreateTestMutation.Field()
+    create_question_answer = CreateQuestionAnswerMutation.Field()
 
 
 class Query(object):
@@ -82,6 +116,7 @@ class Query(object):
         name=graphene.String()
     )
     test_questions = DjangoFilterConnectionField(QuestionType)
+    current_user = graphene.Field(UserType)
 
     def resolve_all_tests(self, info, **kwargs):
         return Test.objects.all()

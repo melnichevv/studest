@@ -38,11 +38,10 @@ export default class Root extends Component {
   }
 
   render() {
-    console.warn(this.props);
     return (
       <ApolloProvider client={client}>
         <Provider store={this.props.store}>
-          <PersistGate loading={<RingLoader color='#123abc' />} persistor={this.props.persistor}>
+          <PersistGate loading={<RingLoader color="#123abc" />} persistor={this.props.persistor}>
             {this.content}
           </PersistGate>
         </Provider>

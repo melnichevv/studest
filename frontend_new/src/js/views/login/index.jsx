@@ -21,11 +21,10 @@ function mapDispatchToProps(dispatch) {
 class LoginView extends Component {
   static propTypes = {
     login: PropTypes.func.isRequired,
-    isFetching: PropTypes.bool.isRequired,
   };
 
   componentDidMount() {
-    // this.props.getAwesomeCode();
+    console.warn(this.props, this.state);
   }
   handleSubmit = (data, dispatch, form) => {
     console.warn('handleSubmit', data, dispatch, form);
@@ -39,7 +38,10 @@ class LoginView extends Component {
       <Fragment>
         <div>
           <h1>LoginView</h1>
-          <LoginForm onSubmit={this.handleSubmit} isFetching={this.props.core.isFetching} />
+          <LoginForm
+            onSubmit={this.handleSubmit}
+            // isFetching={this.props.core.isFetching}
+          />
         </div>
       </Fragment>
     );

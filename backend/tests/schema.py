@@ -1,12 +1,9 @@
-from django.core.exceptions import ValidationError
-import json
-
 import graphene
-from graphene import String, Int
+from graphene import String, Int, Boolean
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
 
-from tests.models import Test, Question
+from tests.models import Test, Question, Answer
 
 
 class TestType(DjangoObjectType):
@@ -33,6 +30,15 @@ class QuestionType(DjangoObjectType):
     class Meta:
         model = Question
         filter_fields = {'type': ['exact']}
+        interfaces = (graphene.Node,)
+
+
+class AnswerType(DjangoObjectType):
+    text = String()
+    correct = Boolean()
+
+    class Meta:
+        model = Answer
         interfaces = (graphene.Node,)
 
 

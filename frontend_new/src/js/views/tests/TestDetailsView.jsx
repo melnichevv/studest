@@ -4,6 +4,9 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import processDate from '../../utils/date';
+import RadioQuestion from '../../common/components/Question/RadioQuestion';
+import CheckboxQuestion from '../../common/components/Question/CheckboxQuestion';
+import TextQuestion from "../../common/components/Question/TextQuestion";
 
 export const query = gql`
   query DetailView($uuid: String!) {
@@ -16,12 +19,21 @@ export const query = gql`
         edges {
           node {
             id
+            uuid
             type
             question
             imgUrl
             videoUrl
             audioUrl
             otherUrl
+            answers {
+              edges {
+                node {
+                  text
+                  correct
+                }
+              }
+            }
           }
         }
       }
@@ -51,18 +63,26 @@ class TestDetailsView extends Component {
     return (
       <div>
         <h1>Test "{data.test.name}"</h1>
-        <p>Time allowed: {data.test.minutes}</p>
-        <p>Start at: {processDate(data.test.startAt)}</p>
-        <p>Description: {data.test.description}</p>
+        <div>Time allowed: {data.test.minutes}</div>
+        <div>Start at: {processDate(data.test.startAt)}</div>
+        <div>Description: {data.test.description}</div>
         {data.test.questions.edges.map(item => (
-          <p key={item.node.id}>
-            <p>Type: {item.node.type}</p>
-            <p>Question: {item.node.question}</p>
+          <div key={item.node.id}>
             {item.node.imgUrl ? <p>Image URL: {item.node.imgUrl}</p> : ''}
             {item.node.audioUrl ? <p>Audio URL: {item.node.audioUrl}</p> : ''}
             {item.node.videoURL ? <p>Video URL: {item.node.videoUrl}</p> : ''}
             {item.node.otherURL ? <p>Other URL: {item.node.otherURL}</p> : ''}
-          </p>
+            {item.node.type === 'radio'}
+            {
+              item.node.type === 'radio' && <RadioQuestion question={item.node} />
+            }
+            {
+              item.node.type === 'checkbox' && <CheckboxQuestion question={item.node} />
+            }
+            {
+              item.node.type === 'text' && <TextQuestion question={item.node} />
+            }
+          </div>
         ))}
       </div>
     );

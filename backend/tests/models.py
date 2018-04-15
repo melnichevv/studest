@@ -41,6 +41,9 @@ class Question(UuidMixin, TimeStampedModel):
     audio_url = models.CharField(_('audio URL'), max_length=255, blank=True, null=True)
     other_url = models.CharField(_('other URL'), max_length=255, blank=True, null=True)
 
+    def __str__(self):
+        return f"{self.question} [{self.type}]"
+
 
 class Answer(UuidMixin, TimeStampedModel):
     """

@@ -17,12 +17,20 @@ export const query = gql`
       edges {
         node {
           id
-          name
-          description
-          created
-          startAt
-          minutes
           uuid
+          status
+          result
+          startTime
+          endTime
+          test {
+            id
+            name
+            description
+            created
+            startAt
+            minutes
+            uuid
+          }
         }
       }
       pageInfo {
@@ -80,6 +88,7 @@ class TestsView extends Component {
               <thead>
                 <tr>
                   <th>Name</th>
+                  <th>Status</th>
                   <th>Description</th>
                   <th>Start at</th>
                   <th>Time allowed</th>
@@ -105,6 +114,7 @@ class TestsView extends Component {
             <thead>
               <tr>
                 <th>Name</th>
+                <th>Status</th>
                 <th>Description</th>
                 <th>Start at</th>
                 <th>Time allowed</th>
@@ -112,27 +122,34 @@ class TestsView extends Component {
               </tr>
             </thead>
             <tbody>
-              {data.allTests && data.allTests.edges.length > 0 && data.allTests.edges.map(item => (
-                <tr key={item.node.id}>
-                  <td>
-                    <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.name}</Link>
-                  </td>
-                  <td>
-                    {item.node.description}
-                  </td>
-                  <td>
-                    {processDate(item.node.startAt)}
-                  </td>
-                  <td>
-                    {item.node.minutes}m
-                  </td>
-                  <td>
-                    {processDate(item.node.created)}
-                  </td>
-                </tr>
-              ))}
               {
-                (!data.allTests || data.allTests.edges.length === 0) &&
+                data.userTests &&
+                data.userTests.edges.length > 0 &&
+                data.userTests.edges.map(item => (
+                  <tr key={item.node.id}>
+                    <td>
+                      <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.test.name}</Link>
+                    </td>
+                    <td>
+                      {item.node.status}
+                    </td>
+                    <td>
+                      {item.node.test.description}
+                    </td>
+                    <td>
+                      {processDate(item.node.test.startAt)}
+                    </td>
+                    <td>
+                      {item.node.test.minutes}m
+                    </td>
+                    <td>
+                      {processDate(item.node.test.created)}
+                    </td>
+                  </tr>
+                ))
+              }
+              {
+                (!data.userTests || data.userTests.edges.length === 0) &&
                 <tr>
                   <td colSpan="5">
                     No tests
@@ -141,7 +158,7 @@ class TestsView extends Component {
               }
             </tbody>
           </Table>
-          {data.allTests && data.allTests.pageInfo.hasNextPage && (
+          {data.userTests && data.userTests.pageInfo.hasNextPage && (
             <button onClick={() => this.loadMore()}>Load more...</button>
           )}
         </div>

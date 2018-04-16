@@ -20,6 +20,7 @@ function mapDispatchToProps(dispatch) {
 class TextQuestion extends PureComponent {
   static propTypes = {
     question: PropTypes.object.isRequired,
+    testResult: PropTypes.object.isRequired,
   };
 
   constructor(props) {

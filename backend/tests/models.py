@@ -44,6 +44,48 @@ class Question(UuidMixin, TimeStampedModel):
     def __str__(self):
         return f"{self.question} [{self.type}]"
 
+    @property
+    def all_answers(self):
+        return self.answers.order_by('pk').all()
+
+    @property
+    def correct_answers(self):
+        return self.answers.filter(correct=True).order_by('pk')
+
+    @property
+    def correct_answers_pk(self):
+        return self.answers.filter(correct=True).values_list('pk', flat=True).order_by('pk')
+
+    @property
+    def random_answers(self):
+        return self.answers.order_by('?')
+
+    def check_if_correct(self, pre_answer, expanded=False):
+        correct = None
+        if self.type == self.RADIO:
+            correct_answer = self.correct_answers.first()
+            answer = int(pre_answer[0])
+            if correct_answer.pk == answer:
+                return True
+            if expanded:
+                correct = correct_answer
+        elif self.type == self.CHECKBOX:
+            correct_answers = self.correct_answers
+            answer = (int(x) for x in pre_answer)
+            if set(answer) == set(correct_answers.values_list('pk', flat=True)):
+                return True
+            if expanded:
+                correct = correct_answers
+        elif self.type == self.TEXT:
+            correct_answer = self.correct_answers.first()
+            if pre_answer[0] == correct_answer.text:
+                return True
+            if expanded:
+                correct = correct_answer
+        if not expanded:
+            return False
+        return False, correct
+
 
 class Answer(UuidMixin, TimeStampedModel):
     """
@@ -173,10 +215,10 @@ class TestResult(UuidMixin, TimeStampedModel):
 
 
 class QuestionAnswer(UuidMixin, TimeStampedModel):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, related_name='user_answers', on_delete=models.CASCADE)
+    student = models.ForeignKey(User, related_name='user_answers', on_delete=models.CASCADE)
     answer = JSONField()
-    correct = models.BooleanField()
+    correct = models.NullBooleanField(null=True)
     result = models.ForeignKey(
         TestResult,
         verbose_name=TestResult._meta.verbose_name,
@@ -185,9 +227,9 @@ class QuestionAnswer(UuidMixin, TimeStampedModel):
     )
 
     @classmethod
-    def get_or_create(cls, question, student, result, answer, correct):
+    def get_or_create(cls, question, student, result, answer, correct=None):
         """
-        Gets the existing contact field or creates a new field if it doesn't exist
+        Gets existing question answer or create a new one if it doesn't exist
         """
         qa = QuestionAnswer.objects.filter(question=question, student=student, result=result).first()
         if qa:
@@ -204,3 +246,9 @@ class QuestionAnswer(UuidMixin, TimeStampedModel):
             qa = QuestionAnswer(**ans_data)
         qa.save()
         return qa
+
+    @property
+    def raw_answers(self):
+        if self.question.type == self.question.RADIO:
+            return
+        return

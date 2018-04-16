@@ -1,5 +1,5 @@
 import graphene
-from graphene import String, Int, Boolean
+from graphene import String, Int, Boolean, Field
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
@@ -31,21 +31,6 @@ class TestResultType(DjangoObjectType):
         interfaces = (graphene.Node,)
 
 
-class QuestionType(DjangoObjectType):
-    type = String()
-    question = String()
-    video_url = String()
-    img_url = String()
-    audio_url = String()
-    other_url = String()
-    # labels = ''
-
-    class Meta:
-        model = Question
-        filter_fields = {'type': ['exact']}
-        interfaces = (graphene.Node,)
-
-
 class AnswerType(DjangoObjectType):
     text = String()
     correct = Boolean()
@@ -53,6 +38,32 @@ class AnswerType(DjangoObjectType):
     class Meta:
         model = Answer
         interfaces = (graphene.Node,)
+
+
+class QuestionType(DjangoObjectType):
+    type = String()
+    question = String()
+    video_url = String()
+    img_url = String()
+    audio_url = String()
+    other_url = String()
+    current_answer = String()
+    # labels = ''
+
+    class Meta:
+        model = Question
+        filter_fields = {'type': ['exact']}
+        interfaces = (graphene.Node,)
+
+    @staticmethod
+    def resolve_current_answer(instance: Question, info):
+        user_answers = instance.user_answers.filter(student=info.context.user).first()
+        if not user_answers:
+            return
+
+        if instance.type == Question.RADIO:
+            return user_answers.answer[0]
+        return user_answers.answer
 
 #
 # class TestResultType(DjangoObjectType):
@@ -67,6 +78,12 @@ class QuestionAnswerType(DjangoObjectType):
     class Meta:
         model = QuestionAnswer
         interfaces = (graphene.Node,)
+
+    @staticmethod
+    def resolve_answer(instance: QuestionAnswer, info):
+        if instance.question.type == Question.RADIO:
+            return instance.answer[0]
+        return instance.answer
 
 
 class CreateTestMutation(graphene.Mutation):
@@ -99,18 +116,32 @@ class CreateQuestionAnswerMutation(graphene.Mutation):
     class Arguments:
         answers = graphene.List(graphene.String)
         question = graphene.String()
+        test_result = graphene.String()
 
     status = graphene.Int()
     formErrors = graphene.String()
-    question = graphene.Field(QuestionType)
-    # answer = graphene.String()
-    # message = graphene.Field(TestType)
+    answer = graphene.Field(QuestionAnswerType)
 
-    def mutate(self, info, answers, question):
-        answers = [from_global_id(x)[1] for x in answers]
-        question = Question.objects.get(uuid=question)
-        answers = Answer.objects.filter(question=question, id__in=answers)
+    def mutate(self, info, test_result, answers, question):
         current_user = info.context.user
+        test_result = TestResult.objects.filter(uuid=test_result, user=current_user).first()
+        question = Question.objects.get(uuid=question)
+        answer = None
+        if question.type == Question.CHECKBOX:
+            # answer = [from_global_id(x)[1] for x in answers]
+            answer = answers
+        elif question.type == Question.RADIO:
+            answer = answers[0]
+        elif question.type == Question.TEXT:
+            answer = answers[0]
+
+        qa = QuestionAnswer.get_or_create(
+            question=question,
+            student=current_user,
+            result=test_result,
+            answer=answer
+        )
+        return CreateQuestionAnswerMutation(status=200, answer=qa)
 
 
 class Mutation(object):
@@ -143,6 +174,19 @@ class Query(object):
 
     def resolve_test(self, info, uuid):
         return Test.objects.get(uuid=uuid)
+
+    test_result = graphene.Field(
+        TestResultType,
+        id=graphene.ID(),
+        uuid=graphene.String()
+    )
+
+    def resolve_test_result(self, info, uuid):
+        user = info.context.user
+        if not user.is_authenticated:
+            return None
+        result = TestResult.objects.filter(user=user, uuid=uuid).first()
+        return result
 
     test_questions = DjangoFilterConnectionField(QuestionType)
 

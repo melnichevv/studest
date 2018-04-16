@@ -64,7 +64,7 @@ class Header extends PureComponent {
               {
                 !!this.props.auth.token &&
                 <NavItem>
-                  <NavLink tag={Link} to="/tests/">Tests</NavLink>
+                  <NavLink tag={Link} to="/tests/" replace>Tests</NavLink>
                 </NavItem>
               }
               {

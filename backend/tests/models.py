@@ -118,6 +118,10 @@ class TestResult(UuidMixin, TimeStampedModel):
         verbose_name_plural = _('test answers')
         ordering = ('pk',)
 
+    @property
+    def name(self):
+        return self.test.name
+
     def start(self):
         if self.status != self.NEW:
             raise Http404

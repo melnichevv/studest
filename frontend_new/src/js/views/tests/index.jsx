@@ -12,8 +12,8 @@ import SearchForm from '../core/SearchForm';
 import processDate from '../../utils/date';
 
 export const query = gql`
-  query ListViewSearch($search: String, $endCursor: String) {
-    allTests(first: 2, name_Icontains: $search, after: $endCursor) {
+  query ListViewSearch($search: String, $endCursor: String, $status: String) {
+    userTests(first: 2, test_Name_Icontains: $search, after: $endCursor, status: $status) {
       edges {
         node {
           id
@@ -65,7 +65,7 @@ class TestsView extends Component {
 
   render() {
     const { data } = this.props;
-    if (data.loading || !data.allTests) {
+    if (data.loading) {
       const initialSearch = queryString.parse(this.props.location.search).search;
       /* TODO This causes a warning of bad code. Fixme */
       // if (this.props.core.search !== initialSearch) {
@@ -88,7 +88,7 @@ class TestsView extends Component {
               </thead>
               <tbody>
                 <tr>
-                  <th colSpan={5}>Loading...</th>
+                  <th colSpan="5">Loading...</th>
                 </tr>
               </tbody>
             </Table>
@@ -112,7 +112,7 @@ class TestsView extends Component {
               </tr>
             </thead>
             <tbody>
-              {data.allTests.edges.length > 0 && data.allTests.edges.map(item => (
+              {data.allTests && data.allTests.edges.length > 0 && data.allTests.edges.map(item => (
                 <tr key={item.node.id}>
                   <td>
                     <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.name}</Link>
@@ -132,16 +132,16 @@ class TestsView extends Component {
                 </tr>
               ))}
               {
-                data.allTests.edges.length === 0 &&
+                (!data.allTests || data.allTests.edges.length === 0) &&
                 <tr>
-                  <td colSpan={4}>
+                  <td colSpan="5">
                     No tests
                   </td>
                 </tr>
               }
             </tbody>
           </Table>
-          {data.allTests.pageInfo.hasNextPage && (
+          {data.allTests && data.allTests.pageInfo.hasNextPage && (
             <button onClick={() => this.loadMore()}>Load more...</button>
           )}
         </div>

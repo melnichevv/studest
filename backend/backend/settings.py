@@ -70,8 +70,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-JWT_VERIFY_EXPIRATION = False
-
 CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
@@ -156,4 +154,5 @@ STATIC_URL = '/static/'
 
 JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.utils.jwt_response_payload_handler',
+    'JWT_VERIFY_EXPIRATION': False,
 }

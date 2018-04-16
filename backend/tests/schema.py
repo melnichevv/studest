@@ -15,7 +15,19 @@ class TestType(DjangoObjectType):
 
     class Meta:
         model = Test
-        filter_fields = {'name': ['icontains']}
+        filter_fields = {'name': ['icontains'], 'solved_tests__status': ['exact']}
+        interfaces = (graphene.Node,)
+
+
+class TestResultType(DjangoObjectType):
+    name = String()
+    minutes = Int()
+    start_at = String()
+    description = String()
+
+    class Meta:
+        model = TestResult
+        filter_fields = {'test__name': ['icontains'], 'status': ['exact']}
         interfaces = (graphene.Node,)
 
 
@@ -42,12 +54,12 @@ class AnswerType(DjangoObjectType):
         model = Answer
         interfaces = (graphene.Node,)
 
-
-class TestResultType(DjangoObjectType):
-
-    class Meta:
-        model = TestResult
-        interfaces = (graphene.Node,)
+#
+# class TestResultType(DjangoObjectType):
+#
+#     class Meta:
+#         model = TestResult
+#         interfaces = (graphene.Node,)
 
 
 class QuestionAnswerType(DjangoObjectType):
@@ -108,24 +120,36 @@ class Mutation(object):
 
 class Query(object):
     all_tests = DjangoFilterConnectionField(TestType)
-    # all_tests = graphene.List(TestType)
+
+    def resolve_all_tests(self, info, **kwargs):
+        return Test.objects.all()
+
+    user_tests = DjangoFilterConnectionField(TestResultType)
+
+    def resolve_user_tests(self, info, **kwargs):
+        user = info.context.user
+        if not user.is_authenticated:
+            return Test.objects.none()
+        results = TestResult.objects.filter(user=user)
+        # TODO filter results here
+        return results
+
     test = graphene.Field(
         TestType,
         id=graphene.ID(),
         uuid=graphene.String(),
         name=graphene.String()
     )
-    test_questions = DjangoFilterConnectionField(QuestionType)
-    current_user = graphene.Field(UserType)
 
-    def resolve_all_tests(self, info, **kwargs):
-        return Test.objects.all()
+    def resolve_test(self, info, uuid):
+        return Test.objects.get(uuid=uuid)
+
+    test_questions = DjangoFilterConnectionField(QuestionType)
 
     def resolve_test_questions(self, info, **kwargs):
         return Question.objects.all()
 
-    def resolve_test(self, info, uuid):
-        return Test.objects.get(uuid=uuid)
+    current_user = graphene.Field(UserType)
 
     def resolve_current_user(self, info, **kwargs):
         context = info.context

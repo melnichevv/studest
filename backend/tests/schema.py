@@ -1,5 +1,7 @@
+import json
+
 import graphene
-from graphene import String, Int, Boolean, Field
+from graphene import String, Int, Boolean, Field, List
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
@@ -61,9 +63,9 @@ class QuestionType(DjangoObjectType):
         if not user_answers:
             return
 
-        if instance.type == Question.RADIO:
-            return user_answers.answer[0]
-        return user_answers.answer
+        # if instance.type == Question.RADIO:
+        return user_answers.answer[0]  # FIXME THIS IS FUCKING RIDICULOUS
+        # return user_answers.answer
 
 #
 # class TestResultType(DjangoObjectType):

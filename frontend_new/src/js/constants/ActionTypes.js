@@ -10,3 +10,5 @@ export const SAVE_SEARCH = 'SAVE_SEARCH';
 export const LOGIN = 'LOGIN';
 export const LOGIN_FAILED = 'LOGIN_FAILED';
 export const UNAUTHORIZE = 'UNAUTHORIZE';
+
+export const SAVE_ANSWER = 'SAVE_ANSWER';

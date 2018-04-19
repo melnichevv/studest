@@ -3,6 +3,7 @@ import { reducer as formReducer } from 'redux-form';
 import { routerReducer as routing } from 'react-router-redux';
 import auth from './auth';
 import core from './core';
+import test from './test';
 
 /**
  * combineReducers is important to understand. As your app might grow in size
@@ -20,6 +21,7 @@ import core from './core';
 const rootReducer = combineReducers({
   auth, // you might be used to: auth: auth,
   core,
+  test,
   routing,
   form: formReducer,
 });

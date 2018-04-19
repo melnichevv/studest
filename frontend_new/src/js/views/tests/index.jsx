@@ -97,7 +97,7 @@ class TestsView extends Component {
               </thead>
               <tbody>
                 <tr>
-                  <th colSpan="5">Loading...</th>
+                  <th colSpan="6">Loading...</th>
                 </tr>
               </tbody>
             </Table>
@@ -128,7 +128,7 @@ class TestsView extends Component {
                 data.userTests.edges.map(item => (
                   <tr key={item.node.id}>
                     <td>
-                      <Link to={`/tests/${item.node.uuid}/details/`}>{item.node.test.name}</Link>
+                      <Link to={`/tests/${item.node.uuid}/details/`} replace>{item.node.test.name}</Link>
                     </td>
                     <td>
                       {item.node.status}

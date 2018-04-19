@@ -2,10 +2,8 @@ import { connect } from 'react-redux';
 import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-// import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
 import { FormGroup, Label, Input } from 'reactstrap';
-// import * as logout from '../../../actions/authActions';
 require('./Question.css');
 
 const mutation = gql`
@@ -20,13 +18,13 @@ const mutation = gql`
   }
 `;
 
-const query = gql`
-{
-  currentUser {
-    id
-  }
-}
-`
+// const query = gql`
+// {
+//   currentUser {
+//     id
+//   }
+// }
+// `;
 
 const mapStateToProps = state => ({
   ...state,
@@ -48,17 +46,7 @@ class RadioQuestion extends Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
-    this.state = {
-      isOpen: false,
-    };
     this.handleChange = this.handleChange.bind(this);
-  }
-
-  toggle() {
-    this.setState({
-      isOpen: !this.state.isOpen,
-    });
   }
 
   handleChange(event) {
@@ -71,29 +59,20 @@ class RadioQuestion extends Component {
           testResult: this.props.testResult.uuid,
         },
       })
-      .then(res => {
+      .then((res) => {
         console.warn('res', res);
         console.warn(JSON.parse(res.data.createQuestionAnswer.answer.answer));
-        // if (res.data.createMessage.status === 200) {
-        //   window.location.replace('/')
-        // }
-        // if (res.data.createMessage.status === 400) {
-        //   this.setState({
-        //     formErrors: JSON.parse(res.data.createMessage.formErrors),
-        //   })
-        // }
       })
-      .catch(err => {
-        console.log('Network error')
-      })
+      .catch((err) => {
+        console.log('Network error');
+      });
   }
 
   render() {
-    console.warn('radio', this.props);
     return (
       <div className="radio-question">
-        <FormGroup tag="aa">
-          <legend>{this.props.question.question}[{this.props.question.currentAnswer}]</legend>
+        <FormGroup tag="div">
+          <legend>{this.props.question.question}</legend>
           {this.props.question.answers.edges.map(item => (
             <FormGroup check>
               <Label check>
@@ -115,7 +94,7 @@ class RadioQuestion extends Component {
 }
 
 // eslint-disable-next-line no-class-assign
-RadioQuestion = graphql(query)(RadioQuestion);
+// RadioQuestion = graphql(query)(RadioQuestion);
 // eslint-disable-next-line no-class-assign
 RadioQuestion = graphql(mutation)(RadioQuestion);
 export default RadioQuestion;

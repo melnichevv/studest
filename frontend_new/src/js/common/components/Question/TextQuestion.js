@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
 import React, { PureComponent } from 'react';
-// import { bindActionCreators } from 'redux';
 import PropTypes from 'prop-types';
-import { FormGroup, Label, Input } from 'reactstrap';
+import { FormGroup, Input } from 'reactstrap';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-// import * as logout from '../../../actions/authActions';
+import { SAVE_TIMEOUT } from '../../../constants/core';
+
 require('./Question.css');
 
 const mutation = gql`
@@ -39,32 +39,44 @@ class TextQuestion extends PureComponent {
 
   constructor(props) {
     super(props);
-
+    this.state = {
+      currentAnswer: props.question.currentAnswer,
+    };
+    this.saveResults = this.saveResults.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
 
-  handleChange(event) {
-    console.warn(event.target.value);
+  saveResults(value) {
+    const now = Date.now();
+    const diff = now - this.state.lastEdit;
+    if (diff >= SAVE_TIMEOUT) {
+      this.props
+        .mutate({
+          variables: {
+            question: this.props.question.uuid,
+            answers: value,
+            testResult: this.props.testResult.uuid,
+          },
+        })
+        .then((res) => {
+          console.warn('res', res);
+        })
+        .catch((err) => {
+          console.log('Network error');
+        });
+    }
+  }
 
-    /* TODO Add submit by timeout */
-    this.props
-      .mutate({
-        variables: {
-          question: this.props.question.uuid,
-          answers: event.target.value,
-          testResult: this.props.testResult.uuid,
-        },
-      })
-      .then((res) => {
-        console.warn('res', res);
-      })
-      .catch((err) => {
-        console.log('Network error');
-      });
+  handleChange(event) {
+    this.setState(Object.assign({}, this.state, {
+      lastEdit: Date.now(),
+      currentAnswer: event.target.value,
+    }));
+
+    setTimeout(this.saveResults, SAVE_TIMEOUT, event.target.value);
   }
 
   render() {
-    // console.warn('text', this.props);
     return (
       <div className="text-question">
         <FormGroup tag="div">
@@ -74,8 +86,9 @@ class TextQuestion extends PureComponent {
               type="textarea"
               name={this.props.question.uuid}
               id={this.props.question.uuid}
-              // value={item.node.uuid}
+              value={this.state.currentAnswer}
               onChange={this.handleChange}
+              rows={Math.max(this.state.currentAnswer.split(/\r*\n/).length, 3)}
             />
           </FormGroup>
         </FormGroup>

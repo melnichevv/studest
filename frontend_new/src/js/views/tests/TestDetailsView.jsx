@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import processDate from '../../utils/date';
+import { processDate, toMoment } from '../../utils/date';
 import RadioQuestion from '../../common/components/Question/RadioQuestion';
 import CheckboxQuestion from '../../common/components/Question/CheckboxQuestion';
 import TextQuestion from '../../common/components/Question/TextQuestion';
@@ -68,6 +68,10 @@ function mapDispatchToProps(dispatch) {
 class TestDetailsView extends Component {
   render() {
     const { data } = this.props;
+    // if (!data.loading) {
+    //   console.warn(Date.now(), toMoment(data.testResult.test.startAt));
+    //   console.warn(Date.now() - toMoment(data.testResult.test.startAt));
+    // }
     if (data.loading || !data.testResult) {
       return <div>Loading...</div>;
     }

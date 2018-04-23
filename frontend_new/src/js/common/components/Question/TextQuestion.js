@@ -40,7 +40,7 @@ class TextQuestion extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      currentAnswer: props.question.currentAnswer,
+      currentAnswer: props.question.currentAnswer ? props.question.currentAnswer : '',
     };
     this.saveResults = this.saveResults.bind(this);
     this.handleChange = this.handleChange.bind(this);

@@ -1,7 +1,8 @@
 import json
 
 import graphene
-from graphene import String, Int, Boolean, Field, List
+from django.utils import timezone
+from graphene import String, Int, Boolean, Field, List, JSONString
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
 from graphql_relay.node.node import from_global_id
@@ -14,11 +15,16 @@ class TestType(DjangoObjectType):
     minutes = Int()
     start_at = String()
     description = String()
+    result = graphene.Field('tests.schema.TestResultType')
 
     class Meta:
         model = Test
-        filter_fields = {'name': ['icontains'], 'solved_tests__status': ['exact']}
+        filter_fields = {'name': ['icontains'], 'solved_tests__status': ['exact'], 'status': ['exact']}
         interfaces = (graphene.Node,)
+
+    @staticmethod
+    def resolve_result(instance: Test, info):
+        return TestResult.objects.filter(test=instance, user=info.context.user).first()
 
 
 class TestResultType(DjangoObjectType):
@@ -59,7 +65,10 @@ class QuestionType(DjangoObjectType):
 
     @staticmethod
     def resolve_current_answer(instance: Question, info):
-        user_answers = instance.user_answers.filter(student=info.context.user).first()
+        user_answers = instance.user_answers.filter(
+            student=info.context.user,
+            result__uuid=info.variable_values['uuid']
+        ).first()
         if not user_answers:
             return
 
@@ -114,6 +123,20 @@ class CreateTestMutation(graphene.Mutation):
         #     return CreateTestMutation(status=200, message=message)
 
 
+class StartTestMutation(graphene.Mutation):
+    class Arguments:
+        test = graphene.String()
+
+    status = graphene.Int()
+
+    def mutate(self, info, test):
+        test = Test.objects.get(uuid=test)
+        if not info.context.user.is_authenticated:
+            return StartTestMutation(status=404)
+        TestResult.objects.get_or_create(user=info.context.user, test=test, status=TestResult.IN_PROGRESS)
+        return StartTestMutation(status=200)
+
+
 class CreateQuestionAnswerMutation(graphene.Mutation):
     class Arguments:
         answers = graphene.List(graphene.String)
@@ -149,6 +172,7 @@ class CreateQuestionAnswerMutation(graphene.Mutation):
 class Mutation(object):
     create_test = CreateTestMutation.Field()
     create_question_answer = CreateQuestionAnswerMutation.Field()
+    start_test = StartTestMutation.Field()
 
 
 class Query(object):
@@ -157,13 +181,22 @@ class Query(object):
     def resolve_all_tests(self, info, **kwargs):
         return Test.objects.all()
 
-    user_tests = DjangoFilterConnectionField(TestResultType)
+    user_tests = DjangoFilterConnectionField(TestType)
 
     def resolve_user_tests(self, info, **kwargs):
         user = info.context.user
         if not user.is_authenticated:
             return Test.objects.none()
-        results = TestResult.objects.filter(user=user)
+        user_tests_ids = list(TestResult.objects.filter(user=user).values_list('test', flat=True))
+        accessible_tests_ids = list(
+            Test.objects.filter(
+                status=Test.STATUS_OPEN,
+                start_at__lte=timezone.now(),
+                accessible_by=Test.ACCESSIBLE_BY_ANYONE
+            ).values_list('id', flat=True)
+        )
+        test_ids = set(user_tests_ids + accessible_tests_ids)
+        results = Test.objects.filter(pk__in=test_ids).all()
         # TODO filter results here
         return results
 
@@ -187,7 +220,7 @@ class Query(object):
         user = info.context.user
         if not user.is_authenticated:
             return None
-        result = TestResult.objects.filter(user=user, uuid=uuid).first()
+        result = TestResult.objects.filter(user=user, test__uuid=uuid).first()
         return result
 
     test_questions = DjangoFilterConnectionField(QuestionType)

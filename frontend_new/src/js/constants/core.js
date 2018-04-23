@@ -1,2 +1,27 @@
 /* used for async saving user changes */
 export const SAVE_TIMEOUT = 3000;
+
+export const MIN_ITEM_LOAD = 10;
+
+export const TEST_STATUS_OPEN = 'OPEN';
+export const TEST_STATUS_OPEN_PRT = 'open';
+export const TEST_STATUS_CLOSED = 'CLOSED';
+export const TEST_STATUS_CLOSED_PRT = 'closed';
+
+export const TEST_STATUSES = {
+  [TEST_STATUS_OPEN]: [TEST_STATUS_OPEN_PRT],
+  [TEST_STATUS_CLOSED]: [TEST_STATUS_CLOSED_PRT],
+};
+
+export const TEST_RESULT_STATUS_NEW = 'NEW';
+export const TEST_RESULT_STATUS_NEW_PRT = 'new';
+export const TEST_RESULT_STATUS_IN_PROGRESS = 'IN_PROGRESS';
+export const TEST_RESULT_STATUS_IN_PROGRESS_PRT = 'in progress';
+export const TEST_RESULT_STATUS_DONE = 'DONE';
+export const TEST_RESULT_STATUS_DONE_PRT = 'done';
+
+export const TEST_RESULT_STATUSES = {
+  [TEST_RESULT_STATUS_NEW]: [TEST_RESULT_STATUS_NEW_PRT],
+  [TEST_RESULT_STATUS_IN_PROGRESS]: [TEST_RESULT_STATUS_IN_PROGRESS_PRT],
+  [TEST_RESULT_STATUS_DONE]: [TEST_RESULT_STATUS_DONE_PRT],
+};

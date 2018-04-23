@@ -112,13 +112,36 @@ class Test(UuidMixin, TimeStampedModel):
     """
     Test model
     """
+    ACCESSIBLE_BY_ANYONE = 'anyone'
+    ACCESSIBLE_BY_INVITE = 'invite'
+    ACCESSIBLE_BY_CHOICES = (
+        (ACCESSIBLE_BY_ANYONE, _('Anyone')),
+        (ACCESSIBLE_BY_INVITE, _('Invite')),
+    )
+
+    STATUS_OPEN = 'open'
+    STATUS_CLOSED = 'closed'
+    STATUS_CHOICES = (
+        (STATUS_OPEN, _('Open')),
+        (STATUS_CLOSED, _('Closed')),
+    )
+
+    status = models.CharField(_('status'), max_length=50, choices=STATUS_CHOICES, default=STATUS_OPEN)
     name = models.CharField(_('name'), max_length=255, default='')
     questions = models.ManyToManyField(Question, verbose_name=Question._meta.verbose_name_plural,
                                        related_name=_('tests'))
     minutes = models.IntegerField(_('allowed time'), default=0, help_text=_('Allowed time for fulfilling the test'))
     labels = models.ManyToManyField(Label, verbose_name=Label._meta.verbose_name_plural, blank=True)
     description = models.TextField(_('description'), null=True, blank=True)
+    automatic_start = models.BooleanField(_('should test start automatically'), default=False)
     start_at = models.DateTimeField(_('start at'))
+    accessible_by = models.CharField(
+        _('accessible by'),
+        max_length=50,
+        choices=ACCESSIBLE_BY_CHOICES,
+        default=ACCESSIBLE_BY_ANYONE,
+        help_text=_('Who can pass this test?')
+    )
 
     class Meta:
         verbose_name = _('test')
@@ -149,7 +172,7 @@ class TestResult(UuidMixin, TimeStampedModel):
     user = models.ForeignKey(User, verbose_name=User._meta.verbose_name, related_name=_('tests'),
                              on_delete=models.CASCADE)
     result = models.DecimalField(max_digits=6, decimal_places=3, verbose_name=_('result'), null=True, blank=True)
-    start_time = models.DateTimeField(_('start time'), null=True, blank=True)
+    start_time = models.DateTimeField(_('start time'), null=True, blank=True, auto_now=True)
     end_time = models.DateTimeField(_('end time'), null=True, blank=True)
     status = models.CharField(_('status'), max_length=20, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0])
     uuid = models.CharField(max_length=36, unique=True, db_index=True, default=generate_uuid,

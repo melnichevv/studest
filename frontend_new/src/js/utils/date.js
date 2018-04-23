@@ -1,5 +1,9 @@
 import moment from 'moment';
 
-export default function processDate(strDate) {
+export function processDate(strDate) {
   return moment(strDate).format('YYYY-MM-DD HH:mm');
-};
+}
+
+export function toMoment(strDate) {
+  return moment(strDate);
+}

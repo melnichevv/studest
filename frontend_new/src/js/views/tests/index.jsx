@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import queryString from 'query-string';
@@ -9,27 +8,30 @@ import { bindActionCreators } from 'redux';
 import * as core from '../../actions/coreActions';
 
 import SearchForm from '../core/SearchForm';
-import processDate from '../../utils/date';
+import { processDate } from '../../utils/date';
+import TestLink from '../../common/components/Test/TestLink';
+import { MIN_ITEM_LOAD, TEST_RESULT_STATUSES, TEST_RESULT_STATUS_NEW_PRT } from '../../constants/core';
 
 export const query = gql`
-  query ListViewSearch($search: String, $endCursor: String, $status: String) {
-    userTests(first: 2, test_Name_Icontains: $search, after: $endCursor, status: $status) {
+  query ListViewSearch($minItemLoad: Int, $search: String, $endCursor: String) {
+    userTests(first: $minItemLoad, name_Icontains: $search, after: $endCursor) {
       edges {
         node {
           id
+          name
+          description
+          created
+          startAt
+          minutes
           uuid
           status
-          result
-          startTime
-          endTime
-          test {
+          result {
             id
-            name
-            description
-            created
-            startAt
-            minutes
             uuid
+            status
+            result
+            startTime
+            endTime
           }
         }
       }
@@ -74,8 +76,8 @@ class TestsView extends Component {
   render() {
     const { data } = this.props;
     if (data.loading) {
-      const initialSearch = queryString.parse(this.props.location.search).search;
       /* TODO This causes a warning of bad code. Fixme */
+      // const initialSearch = queryString.parse(this.props.location.search).search;
       // if (this.props.core.search !== initialSearch) {
       //   this.props.coreActions.saveSearch(initialSearch);
       // }
@@ -105,6 +107,7 @@ class TestsView extends Component {
         </Fragment>
       );
     }
+    /* Use different links for new, already started and already finished tests */
     return (
       <Fragment>
         <h1>Tests</h1>
@@ -128,22 +131,25 @@ class TestsView extends Component {
                 data.userTests.edges.map(item => (
                   <tr key={item.node.id}>
                     <td>
-                      <Link to={`/tests/${item.node.uuid}/details/`} replace>{item.node.test.name}</Link>
+                      <TestLink test={item.node} />
                     </td>
                     <td>
-                      {item.node.status}
+                      {
+                        item.node.result ?
+                          TEST_RESULT_STATUSES[item.node.result.status] : TEST_RESULT_STATUS_NEW_PRT
+                      }
                     </td>
                     <td>
-                      {item.node.test.description}
+                      {item.node.description}
                     </td>
                     <td>
-                      {processDate(item.node.test.startAt)}
+                      {processDate(item.node.startAt)}
                     </td>
                     <td>
-                      {item.node.test.minutes}m
+                      {item.node.minutes}m
                     </td>
                     <td>
-                      {processDate(item.node.test.created)}
+                      {processDate(item.node.created)}
                     </td>
                   </tr>
                 ))
@@ -171,6 +177,7 @@ class TestsView extends Component {
 const queryOptions = {
   options: props => ({
     variables: {
+      minItemLoad: MIN_ITEM_LOAD,
       search: queryString.parse(props.location.search).search,
       endCursor: null,
     },

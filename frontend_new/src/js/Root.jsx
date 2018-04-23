@@ -8,9 +8,9 @@ import { BatchHttpLink } from 'apollo-link-batch-http/lib/index';
 import ApolloProvider from 'react-apollo/ApolloProvider';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { RingLoader } from 'react-spinners';
 
 import 'bootstrap/dist/css/bootstrap.css';
+import Loader from './common/components/Loader/Loader';
 
 const middlewareLink = setContext(() => ({
   headers: {
@@ -41,7 +41,7 @@ export default class Root extends Component {
     return (
       <ApolloProvider client={client}>
         <Provider store={this.props.store}>
-          <PersistGate loading={<RingLoader color="#123abc" />} persistor={this.props.persistor}>
+          <PersistGate loading={<Loader />} persistor={this.props.persistor}>
             {this.content}
           </PersistGate>
         </Provider>

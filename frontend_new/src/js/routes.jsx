@@ -10,6 +10,7 @@ import '../assets/fonts/fonts.css';
 import LoginView from './views/login';
 import TestsView from './views/tests';
 import TestDetailsView from './views/tests/TestDetailsView';
+import TestPreView from './views/tests/TestPreView';
 
 
 const HeaderWithRouter = withRouter(props => <Header {...props} />);
@@ -22,6 +23,7 @@ module.exports = (
       <Switch>
         <Route path="/login" component={LoginView} />
         <Route path="/tests/:uuid/details/" component={TestDetailsView} />
+        <Route path="/tests/:uuid/pre/" component={TestPreView} />
         <Route path="/tests" component={TestsView} />
       </Switch>
     </div>

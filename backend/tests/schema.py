@@ -72,9 +72,11 @@ class QuestionType(DjangoObjectType):
         if not user_answers:
             return
 
-        # if instance.type == Question.RADIO:
-        return user_answers.answer[0]  # FIXME THIS IS FUCKING RIDICULOUS
-        # return user_answers.answer
+        answer = user_answers.answer[0]
+
+        if instance.type == Question.RADIO:
+            return answer[0]  # FIXME THIS IS FUCKING RIDICULOUS
+        return answer
 
 #
 # class TestResultType(DjangoObjectType):
@@ -133,8 +135,36 @@ class StartTestMutation(graphene.Mutation):
         test = Test.objects.get(uuid=test)
         if not info.context.user.is_authenticated:
             return StartTestMutation(status=404)
-        TestResult.objects.get_or_create(user=info.context.user, test=test, status=TestResult.IN_PROGRESS)
+        test_result = (
+            TestResult.objects.get_or_create(
+                user=info.context.user,
+                test=test,
+                status=TestResult.NEW
+            )
+        )
+        test_result.start()
         return StartTestMutation(status=200)
+
+
+class FinishTestMutation(graphene.Mutation):
+    class Arguments:
+        test = graphene.String()
+
+    status = graphene.Int()
+
+    def mutate(self, info, test):
+        test = Test.objects.get(uuid=test)
+        if not info.context.user.is_authenticated:
+            return FinishTestMutation(status=404)
+        test_result = (
+            TestResult.objects.get_or_create(
+                user=info.context.user,
+                test=test,
+                status=TestResult.IN_PROGRESS
+            )
+        )
+        test_result.finish()
+        return FinishTestMutation(status=200)
 
 
 class CreateQuestionAnswerMutation(graphene.Mutation):
@@ -156,7 +186,7 @@ class CreateQuestionAnswerMutation(graphene.Mutation):
             # answer = [from_global_id(x)[1] for x in answers]
             answer = answers
         elif question.type == Question.RADIO:
-            answer = answers[0]
+            answer = answers
         elif question.type == Question.TEXT:
             answer = answers[0]
 
@@ -173,6 +203,7 @@ class Mutation(object):
     create_test = CreateTestMutation.Field()
     create_question_answer = CreateQuestionAnswerMutation.Field()
     start_test = StartTestMutation.Field()
+    finish_test = FinishTestMutation.Field()
 
 
 class Query(object):
@@ -220,7 +251,7 @@ class Query(object):
         user = info.context.user
         if not user.is_authenticated:
             return None
-        result = TestResult.objects.filter(user=user, test__uuid=uuid).first()
+        result = TestResult.objects.filter(user=user, uuid=uuid).first()
         return result
 
     test_questions = DjangoFilterConnectionField(QuestionType)

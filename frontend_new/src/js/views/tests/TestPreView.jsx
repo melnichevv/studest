@@ -81,7 +81,7 @@ class TestPreView extends Component {
       .then((res) => {
         if (res.data.startTest.status === 200) {
           console.warn('res', res);
-          this.props.history.push(`/tests/${testUuid}/details`);
+          // this.props.history.push(`/tests/${testUuid}/details`);
         }
       })
       .catch((err) => {

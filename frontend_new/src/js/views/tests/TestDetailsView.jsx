@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import { processDate, toMoment } from '../../utils/date';
+import { processDate } from '../../utils/date';
 import RadioQuestion from '../../common/components/Question/RadioQuestion';
 import CheckboxQuestion from '../../common/components/Question/CheckboxQuestion';
 import TextQuestion from '../../common/components/Question/TextQuestion';
@@ -66,53 +66,92 @@ function mapDispatchToProps(dispatch) {
 
 @connect(mapStateToProps, mapDispatchToProps)
 class TestDetailsView extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit = () => {
+    console.warn('finishing test');
+    this.setState({
+      finishing: true,
+    });
+    /* Call finish mutation here */
+  };
+
   render() {
     const { data } = this.props;
-    // if (!data.loading) {
-    //   console.warn(Date.now(), toMoment(data.testResult.test.startAt));
-    //   console.warn(Date.now() - toMoment(data.testResult.test.startAt));
-    // }
     if (data.loading || !data.testResult) {
       return <div>Loading...</div>;
     }
     data.test = data.testResult.test;
-    return (
+    const testHeader = (
       <div>
-        <h1>Test "{data.test.name}"</h1>
+        <h2 className="test-title">Test "{data.test.name}"</h2>
         <div>Time allowed: {data.test.minutes}</div>
         <div>Start at: {processDate(data.test.startAt)}</div>
         <div>Description: {data.test.description}</div>
-        {data.test.questions.edges.map(item => (
-          <div key={item.node.id}>
-            {item.node.imgUrl ? <p>Image URL: {item.node.imgUrl}</p> : ''}
-            {item.node.audioUrl ? <p>Audio URL: {item.node.audioUrl}</p> : ''}
-            {item.node.videoURL ? <p>Video URL: {item.node.videoUrl}</p> : ''}
-            {item.node.otherURL ? <p>Other URL: {item.node.otherURL}</p> : ''}
-            {item.node.type === 'radio'}
-            {
-              item.node.type === 'radio' &&
-              <RadioQuestion
-                question={item.node}
-                testResult={data.testResult}
-                form={item.node.uuid}
-              />
-            }
-            {
-              item.node.type === 'checkbox' &&
-              <CheckboxQuestion
-                question={item.node}
-                testResult={data.testResult}
-              />
-            }
-            {
-              item.node.type === 'text' &&
-              <TextQuestion
-                question={item.node}
-                testResult={data.testResult}
-              />
-            }
+      </div>
+    );
+    let testBody = '';
+    if (this.state.finishing) {
+      testBody = (
+        <div>
+          <h3>
+            Well done!
+            You will receive an email with your results soon.
+            Please be patient (:
+          </h3>
+        </div>
+      );
+    } else {
+      testBody = (
+        <div>
+          {data.test.questions.edges.map(item => (
+            <div key={item.node.id}>
+              {item.node.imgUrl ? <p>Image URL: {item.node.imgUrl}</p> : ''}
+              {item.node.audioUrl ? <p>Audio URL: {item.node.audioUrl}</p> : ''}
+              {item.node.videoURL ? <p>Video URL: {item.node.videoUrl}</p> : ''}
+              {item.node.otherURL ? <p>Other URL: {item.node.otherURL}</p> : ''}
+              {item.node.type === 'radio'}
+              {
+                item.node.type === 'radio' &&
+                <RadioQuestion
+                  question={item.node}
+                  testResult={data.testResult}
+                  form={item.node.uuid}
+                />
+              }
+              {
+                item.node.type === 'checkbox' &&
+                <CheckboxQuestion
+                  question={item.node}
+                  testResult={data.testResult}
+                />
+              }
+              {
+                item.node.type === 'text' &&
+                <TextQuestion
+                  question={item.node}
+                  testResult={data.testResult}
+                />
+              }
+            </div>
+          ))}
+          <div>
+            <button onClick={this.handleSubmit}>
+              Finish test
+            </button>
           </div>
-        ))}
+        </div>
+      );
+    }
+    return (
+      <div>
+        {testHeader}
+        {testBody}
       </div>
     );
   }

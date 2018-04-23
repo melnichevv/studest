@@ -45,12 +45,19 @@ class RadioQuestion extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      currentAnswer: props.question.currentAnswer,
+    };
 
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(event) {
     console.warn(this.props, event.target.name);
+    const oldAnswer = this.state.currentAnswer;
+    this.setState({
+      currentAnswer: event.target.value,
+    });
     this.props
       .mutate({
         variables: {
@@ -64,6 +71,9 @@ class RadioQuestion extends Component {
         console.warn(JSON.parse(res.data.createQuestionAnswer.answer.answer));
       })
       .catch((err) => {
+        this.setState({
+          currentAnswer: oldAnswer,
+        });
         console.log('Network error');
       });
   }
@@ -74,18 +84,20 @@ class RadioQuestion extends Component {
         <FormGroup tag="div">
           <legend>{this.props.question.question}</legend>
           {this.props.question.answers.edges.map(item => (
-            <FormGroup check>
-              <Label check>
-                <Input
-                  type="radio"
-                  name={this.props.question.uuid}
-                  value={item.node.uuid}
-                  onChange={this.handleChange}
-                  checked={this.props.question.currentAnswer === item.node.uuid}
-                />
-                {item.node.text}
-              </Label>
-            </FormGroup>
+            <div key={item.node.uuid}>
+              <FormGroup check>
+                <Label check>
+                  <Input
+                    type="radio"
+                    name={this.props.question.uuid}
+                    value={item.node.uuid}
+                    onChange={this.handleChange}
+                    checked={this.state.currentAnswer === item.node.uuid}
+                  />
+                  {item.node.text}
+                </Label>
+              </FormGroup>
+            </div>
           ))}
         </FormGroup>
       </div>

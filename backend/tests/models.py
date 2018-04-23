@@ -172,7 +172,7 @@ class TestResult(UuidMixin, TimeStampedModel):
     user = models.ForeignKey(User, verbose_name=User._meta.verbose_name, related_name=_('tests'),
                              on_delete=models.CASCADE)
     result = models.DecimalField(max_digits=6, decimal_places=3, verbose_name=_('result'), null=True, blank=True)
-    start_time = models.DateTimeField(_('start time'), null=True, blank=True, auto_now=True)
+    start_time = models.DateTimeField(_('start time'), null=True, blank=True)
     end_time = models.DateTimeField(_('end time'), null=True, blank=True)
     status = models.CharField(_('status'), max_length=20, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0])
     uuid = models.CharField(max_length=36, unique=True, db_index=True, default=generate_uuid,
@@ -182,6 +182,7 @@ class TestResult(UuidMixin, TimeStampedModel):
         verbose_name = _('test answers')
         verbose_name_plural = _('test answers')
         ordering = ('pk',)
+        unique_together = ('test', 'user')
 
     @property
     def name(self):

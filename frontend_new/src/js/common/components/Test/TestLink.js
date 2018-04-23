@@ -67,7 +67,12 @@ class TestLink extends Component {
     console.warn(this.props.test);
     if (this.props.test.result) {
       return (
-        <Link to={`/tests/${this.props.test.uuid}/details/`} replace>{this.props.test.name}</Link>
+        <Link
+          to={`/tests/${this.props.test.result.uuid}/details/`}
+          replace
+        >
+          {this.props.test.name}
+        </Link>
       );
     } else if (this.props.test.result === null) {
       console.warn('in else', this.props.test.status, this.props.test.result);

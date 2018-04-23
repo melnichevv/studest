@@ -66,8 +66,12 @@ class QuestionAnswerAdmin(admin.ModelAdmin):
     list_filter = ('result', 'correct')
 
 
+class AnswerAdmin(admin.ModelAdmin):
+    list_display = ('text', 'question')
+
+
 admin.site.register(Question, QuestionAdmin)
-admin.site.register(Answer)
+admin.site.register(Answer, AnswerAdmin)
 admin.site.register(Test, TestAdmin)
 admin.site.register(Label)
 admin.site.register(TestResult, TestResultAdmin)

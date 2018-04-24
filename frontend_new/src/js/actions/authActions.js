@@ -32,7 +32,7 @@ export function login(params, history) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: params.username,
+        email: params.email,
         password: params.password,
       }),
     });

@@ -2,16 +2,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getFormValues, Field, reduxForm, formValueSelector } from 'redux-form';
 
-let LoginForm = (props) => {
+let RegisterForm = (props) => {
   return (
     <form onSubmit={props.handleSubmit}>
       <div>
-        <label>Email:</label>
+        <label>Username:</label>
         <Field
-          name="email"
+          name="username"
           component="input"
           type="text"
-          placeholder="Email"
+          placeholder="Username"
         />
       </div>
       <div>
@@ -33,20 +33,20 @@ let LoginForm = (props) => {
   );
 };
 
-LoginForm = reduxForm({
+RegisterForm = reduxForm({
   form: 'login', // a unique identifier for this form
-})(LoginForm);
+})(RegisterForm);
 
 // Decorate with connect to read form values
 const selector = formValueSelector('selectingFormValues'); // <-- same as form name
-LoginForm = connect((state) => {
-  const { email, password } = selector(state, 'email', 'password');
+RegisterForm = connect((state) => {
+  const { username, password } = selector(state, 'username', 'password');
   const formValues = getFormValues('login')(state);
   return {
-    email,
+    username,
     password,
     formValues,
   };
-})(LoginForm);
+})(RegisterForm);
 
-export default LoginForm;
+export default RegisterForm;

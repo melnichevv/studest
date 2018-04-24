@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as auth from '../../actions/authActions';
-import LoginForm from './LoginForm';
+import RegisterForm from './RegisterForm';
 
 require('../../../style/index.css');
 
@@ -30,17 +30,16 @@ class LoginView extends Component {
     console.warn('handleSubmit', data, dispatch, form);
     console.warn(this.props);
     console.warn('this.props');
-    return this.props.login(this.props.form.login.values, this.props.history);
+    return this.props.register(this.props.form.login.values, this.props.history);
   };
 
   render() {
     return (
       <Fragment>
         <div>
-          <h1>Login</h1>
-          <LoginForm
+          <h1>Register</h1>
+          <RegisterForm
             onSubmit={this.handleSubmit}
-            // isFetching={this.props.core.isFetching}
           />
         </div>
       </Fragment>

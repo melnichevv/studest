@@ -1,11 +1,8 @@
-import json
-
 import graphene
 from django.utils import timezone
-from graphene import String, Int, Boolean, Field, List, JSONString
+from graphene import String, Int, Boolean
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
-from graphql_relay.node.node import from_global_id
 from tests.models import Test, Question, Answer, TestResult, QuestionAnswer
 from users.schema import UserType
 

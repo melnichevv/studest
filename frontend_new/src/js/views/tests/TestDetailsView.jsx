@@ -7,7 +7,7 @@ import { processDate } from '../../utils/date';
 import RadioQuestion from '../../common/components/Question/RadioQuestion';
 import CheckboxQuestion from '../../common/components/Question/CheckboxQuestion';
 import TextQuestion from '../../common/components/Question/TextQuestion';
-import {TEST_RESULT_STATUS_DONE, TEST_RESULT_STATUS_REQUIRES_REVIEW} from "../../constants/core";
+import { TEST_RESULT_STATUS_DONE, TEST_RESULT_STATUS_REQUIRES_REVIEW } from '../../constants/core';
 
 export const query = gql`
   query DetailView($uuid: String!) {
@@ -83,7 +83,6 @@ function mapDispatchToProps(dispatch) {
 
 @connect(mapStateToProps, mapDispatchToProps)
 class TestDetailsView extends Component {
-
   constructor(props) {
     super(props);
     this.state = {};

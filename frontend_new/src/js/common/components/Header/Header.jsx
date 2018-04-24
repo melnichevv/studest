@@ -73,6 +73,12 @@ class Header extends PureComponent {
                   <NavLink tag={Link} to="/login/">Login</NavLink>
                 </NavItem>
               }
+              {
+                !this.props.auth.token &&
+                <NavItem>
+                  <NavLink tag={Link} to="/register/">Register</NavLink>
+                </NavItem>
+              }
               { !!this.props.auth.token &&
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret>

@@ -33,13 +33,22 @@ class Question(UuidMixin, TimeStampedModel):
         ('checkbox', _('Multiple Answers')),
         ('text', _('String Answer')),
     )
-    type = models.CharField(_('type'), max_length=30, choices=TYPE_CHOICES, default=TYPE_CHOICES[0][0])
+    type = models.CharField(
+        _('type'),
+        max_length=30,
+        choices=TYPE_CHOICES,
+        default=TYPE_CHOICES[0][0]
+    )
     question = models.TextField()
-    labels = models.ManyToManyField(Label, blank=True, verbose_name=Label._meta.verbose_name_plural)
+    labels = models.ManyToManyField(Label, blank=True, verbose_name=_('labels'))
     video_url = models.CharField(_('video URL'), max_length=255, blank=True, null=True)
     img_url = models.CharField(_('image URL'), max_length=255, blank=True, null=True)
     audio_url = models.CharField(_('audio URL'), max_length=255, blank=True, null=True)
     other_url = models.CharField(_('other URL'), max_length=255, blank=True, null=True)
+    manual_check = models.BooleanField(
+        _('defines whether answer to this question should be manually approved'),
+        default=False
+    )
 
     def __str__(self):
         return f"{self.question} [{self.type}]"
@@ -94,8 +103,8 @@ class Answer(UuidMixin, TimeStampedModel):
     text = models.TextField(_('text'))
     question = models.ForeignKey(
         'Question',
-        verbose_name=Question._meta.verbose_name,
-        related_name=_('answers'),
+        verbose_name=Question._meta.verbose_name_plural,
+        related_name='answers',
         on_delete=models.CASCADE
     )
     correct = models.BooleanField(_('correct'), default=False)
@@ -126,12 +135,28 @@ class Test(UuidMixin, TimeStampedModel):
         (STATUS_CLOSED, _('Closed')),
     )
 
-    status = models.CharField(_('status'), max_length=50, choices=STATUS_CHOICES, default=STATUS_OPEN)
+    status = models.CharField(
+        _('status'),
+        max_length=50,
+        choices=STATUS_CHOICES,
+        default=STATUS_OPEN
+    )
     name = models.CharField(_('name'), max_length=255, default='')
-    questions = models.ManyToManyField(Question, verbose_name=Question._meta.verbose_name_plural,
-                                       related_name=_('tests'))
-    minutes = models.IntegerField(_('allowed time'), default=0, help_text=_('Allowed time for fulfilling the test'))
-    labels = models.ManyToManyField(Label, verbose_name=Label._meta.verbose_name_plural, blank=True)
+    questions = models.ManyToManyField(
+        Question,
+        verbose_name=Question._meta.verbose_name_plural,
+        related_name='tests'
+    )
+    minutes = models.IntegerField(
+        _('allowed time'),
+        default=0,
+        help_text=_('Allowed time for fulfilling the test')
+    )
+    labels = models.ManyToManyField(
+        Label,
+        verbose_name=_('labels'),
+        blank=True
+    )
     description = models.TextField(_('description'), null=True, blank=True)
     automatic_start = models.BooleanField(_('should test start automatically'), default=False)
     start_at = models.DateTimeField(_('start at'))
@@ -161,22 +186,48 @@ class TestResult(UuidMixin, TimeStampedModel):
     """
     NEW = 'new'
     IN_PROGRESS = 'in_progress'
+    REQUIRES_REVIEW = 'requires_review'
     DONE = 'done'
     STATUS_CHOICES = (
         (NEW, _('New')),
         (IN_PROGRESS, _('In progress')),
+        (REQUIRES_REVIEW, _('Required review')),
         (DONE, _('Done')),
     )
-    test = models.ForeignKey(Test, verbose_name=Test._meta.verbose_name, related_name=_('solved_tests'),
-                             on_delete=models.CASCADE)
-    user = models.ForeignKey(User, verbose_name=User._meta.verbose_name, related_name=_('tests'),
-                             on_delete=models.CASCADE)
-    result = models.DecimalField(max_digits=6, decimal_places=3, verbose_name=_('result'), null=True, blank=True)
+    test = models.ForeignKey(
+        Test,
+        verbose_name=Test._meta.verbose_name,
+        related_name='solved_tests',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name=User._meta.verbose_name,
+        related_name='tests',
+        on_delete=models.CASCADE
+    )
+    result = models.DecimalField(
+        max_digits=6,
+        decimal_places=3,
+        verbose_name=_('result'),
+        null=True,
+        blank=True
+    )
     start_time = models.DateTimeField(_('start time'), null=True, blank=True)
     end_time = models.DateTimeField(_('end time'), null=True, blank=True)
-    status = models.CharField(_('status'), max_length=20, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0])
-    uuid = models.CharField(max_length=36, unique=True, db_index=True, default=generate_uuid,
-                            verbose_name=_("Unique Identifier"), help_text=_("The unique identifier for this object"))
+    status = models.CharField(
+        _('status'),
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=NEW
+    )
+    uuid = models.CharField(
+        max_length=36,
+        unique=True,
+        db_index=True,
+        default=generate_uuid,
+        verbose_name=_('Unique Identifier'),
+        help_text=_("The unique identifier for this object"))
 
     class Meta:
         verbose_name = _('test answers')
@@ -200,10 +251,13 @@ class TestResult(UuidMixin, TimeStampedModel):
         if self.status != self.IN_PROGRESS:
             raise Http404
         self.end_time = timezone.now()
-        self.status = self.DONE
+        if self.test.questions.filter(manual_check=True).exists():
+            self.status = self.REQUIRES_REVIEW
+        else:
+            self.status = self.DONE
         self.calculate_results()
         self.save(update_fields=['end_time', 'status'])
-        return
+        return self
 
     def calculate_results(self):
         try:
@@ -231,7 +285,7 @@ class TestResult(UuidMixin, TimeStampedModel):
         return self.status == self.DONE
 
     def __str__(self):
-        return self.test.name
+        return f'{self.test.name} - {self.user.get_full_name()}'
 
     @property
     def correct_answers(self):
@@ -239,8 +293,18 @@ class TestResult(UuidMixin, TimeStampedModel):
 
 
 class QuestionAnswer(UuidMixin, TimeStampedModel):
-    question = models.ForeignKey(Question, related_name='user_answers', on_delete=models.CASCADE)
-    student = models.ForeignKey(User, related_name='user_answers', on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        Question,
+        verbose_name=_('question'),
+        related_name='user_answers',
+        on_delete=models.CASCADE
+    )
+    student = models.ForeignKey(
+        User,
+        verbose_name=_('student'),
+        related_name='user_answers',
+        on_delete=models.CASCADE
+    )
     answer = JSONField()
     correct = models.NullBooleanField(null=True)
     result = models.ForeignKey(
@@ -255,7 +319,8 @@ class QuestionAnswer(UuidMixin, TimeStampedModel):
         """
         Gets existing question answer or create a new one if it doesn't exist
         """
-        qa = QuestionAnswer.objects.filter(question=question, student=student, result=result).first()
+        qa = QuestionAnswer.objects.filter(question=question, student=student,
+                                           result=result).first()
         if qa:
             qa.answer = answer,
             qa.correct = correct

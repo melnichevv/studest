@@ -135,12 +135,10 @@ class StartTestMutation(graphene.Mutation):
         test = Test.objects.get(uuid=test)
         if not info.context.user.is_authenticated:
             return StartTestMutation(status=404)
-        test_result = (
-            TestResult.objects.get_or_create(
-                user=info.context.user,
-                test=test,
-                status=TestResult.NEW
-            )
+        test_result, _ = TestResult.objects.get_or_create(
+            user=info.context.user,
+            test=test,
+            status=TestResult.NEW
         )
         test_result.start()
         return StartTestMutation(status=200)
@@ -151,20 +149,22 @@ class FinishTestMutation(graphene.Mutation):
         test = graphene.String()
 
     status = graphene.Int()
+    test_result = graphene.Field(TestResultType)
 
     def mutate(self, info, test):
         test = Test.objects.get(uuid=test)
         if not info.context.user.is_authenticated:
             return FinishTestMutation(status=404)
-        test_result = (
-            TestResult.objects.get_or_create(
+        try:
+            test_result = TestResult.objects.get(
                 user=info.context.user,
                 test=test,
                 status=TestResult.IN_PROGRESS
             )
-        )
-        test_result.finish()
-        return FinishTestMutation(status=200)
+        except TestResult.DoesNotExist:
+            return FinishTestMutation(status=404)
+        test_result = test_result.finish()
+        return FinishTestMutation(status=200, test_result=test_result)
 
 
 class CreateQuestionAnswerMutation(graphene.Mutation):

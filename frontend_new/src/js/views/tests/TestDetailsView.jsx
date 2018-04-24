@@ -7,6 +7,7 @@ import { processDate } from '../../utils/date';
 import RadioQuestion from '../../common/components/Question/RadioQuestion';
 import CheckboxQuestion from '../../common/components/Question/CheckboxQuestion';
 import TextQuestion from '../../common/components/Question/TextQuestion';
+import {TEST_RESULT_STATUS_DONE, TEST_RESULT_STATUS_REQUIRES_REVIEW} from "../../constants/core";
 
 export const query = gql`
   query DetailView($uuid: String!) {
@@ -22,6 +23,7 @@ export const query = gql`
         description
         minutes
         startAt
+        uuid
         questions {
           edges {
             node {
@@ -52,6 +54,21 @@ export const query = gql`
   }
 `;
 
+const mutation = gql`
+  mutation FinishTest($test: String!) {
+    finishTest(test: $test) {
+      status
+      testResult {
+        uuid
+        status
+        startTime
+        endTime
+        result
+      }
+    }
+  }
+`;
+
 require('../../../style/index.css');
 
 const mapStateToProps = state => ({
@@ -70,15 +87,33 @@ class TestDetailsView extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.finishTest = this.finishTest.bind(this);
   }
 
-  handleSubmit = () => {
-    console.warn('finishing test');
+  finishTest = () => {
+    console.warn('finishing test', this.props);
     this.setState({
       finishing: true,
     });
-    /* Call finish mutation here */
+    const testUuid = this.props.data.test.uuid;
+    this.props
+      .mutate({
+        variables: {
+          test: testUuid,
+        },
+      })
+      .then((res) => {
+        if (res.data.finishTest.status === 200) {
+          const { testResult } = res.data.finishTest;
+          this.setState({
+            finishing: true,
+            testResult,
+          });
+        }
+      })
+      .catch((err) => {
+        console.log('Network error', err);
+      });
   };
 
   render() {
@@ -101,8 +136,30 @@ class TestDetailsView extends Component {
         <div>
           <h3>
             Well done!
-            You will receive an email with your results soon.
-            Please be patient (:
+            {
+              !this.state.testResult &&
+              <div>
+                Sending your results. Please wait.
+              </div>
+            }
+            {
+              this.state.testResult &&
+              <div>
+                {
+                  this.state.testResult.status === TEST_RESULT_STATUS_DONE &&
+                    <div>
+                      Your result is {this.state.testResult.result}
+                    </div>
+                }
+                {
+                  this.state.testResult.status === TEST_RESULT_STATUS_REQUIRES_REVIEW &&
+                    <div>
+                      You will receive an email with your results soon.
+                      Please be patient (:
+                    </div>
+                }
+              </div>
+            }
           </h3>
         </div>
       );
@@ -141,7 +198,7 @@ class TestDetailsView extends Component {
             </div>
           ))}
           <div>
-            <button onClick={this.handleSubmit}>
+            <button onClick={this.finishTest}>
               Finish test
             </button>
           </div>
@@ -167,4 +224,6 @@ const queryOptions = {
 
 // eslint-disable-next-line no-class-assign
 TestDetailsView = graphql(query, queryOptions)(TestDetailsView);
+// eslint-disable-next-line no-class-assign
+TestDetailsView = graphql(mutation)(TestDetailsView);
 export default TestDetailsView;

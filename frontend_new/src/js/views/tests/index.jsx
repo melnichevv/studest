@@ -131,7 +131,7 @@ class TestsView extends Component {
                 data.userTests.edges.map(item => (
                   <tr key={item.node.id}>
                     <td>
-                      <TestLink test={item.node} />
+                      <TestLink test={item.node} user={this.props.auth.user} />
                     </td>
                     <td>
                       {

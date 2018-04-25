@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import { FormGroup, Label, Input } from 'reactstrap';
 
 import * as testActions from '../../../actions/testActions';
+import TextQuestion from "./TextQuestion";
 
 require('./Question.css');
 
@@ -47,14 +48,12 @@ function mapDispatchToProps(dispatch) {
 class CheckboxQuestion extends Component {
   static propTypes = {
     question: PropTypes.object.isRequired,
-    testResult: PropTypes.object.isRequired,
-    saveAnswerLocally: PropTypes.func.isRequired,
+    testResult: PropTypes.object,
+    readonly: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
-    this.toggle = this.toggle.bind(this);
-    console.warn('props in constructor', props);
     const isUpdated = props.test.isUpdated ? props.test.isUpdated : false;
     let { answers } = props.test.answers ? props.test.answers : [];
     if (!isUpdated) {
@@ -65,17 +64,23 @@ class CheckboxQuestion extends Component {
       answers,
       isUpdated,
     };
-    console.warn(this.state);
     this.handleChange = this.handleChange.bind(this);
   }
 
-  toggle() {
-    this.setState({
-      isOpen: !this.state.isOpen,
-    });
+  componentDidUpdate(prevProps, prevState) {
+    // only update answers if the data has changed
+    if (prevProps.question.currentAnswer !== this.props.question.currentAnswer) {
+      this.setState({
+        answers: this.props.question.currentAnswer ? this.props.question.currentAnswer : [],
+        isUpdated: false,
+      });
+    }
   }
 
   handleChange(event) {
+    if (this.props.readonly) {
+      return;
+    }
     let { answers } = this.state;
     if (!answers) {
       answers = [];
@@ -125,6 +130,7 @@ class CheckboxQuestion extends Component {
                   value={item.node.uuid}
                   onChange={this.handleChange}
                   checked={this.state.answers.includes(item.node.uuid)}
+                  readOnly={this.props.readonly}
                 />
                 {item.node.text}
               </Label>
@@ -135,6 +141,11 @@ class CheckboxQuestion extends Component {
     );
   }
 }
+
+CheckboxQuestion.defaultProps = {
+  testResult: {},
+  readonly: false,
+};
 
 // eslint-disable-next-line no-class-assign
 // CheckboxQuestion = graphql(query)(CheckboxQuestion);

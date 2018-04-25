@@ -23,13 +23,7 @@ class LoginView extends Component {
     login: PropTypes.func.isRequired,
   };
 
-  componentDidMount() {
-    console.warn(this.props, this.state);
-  }
   handleSubmit = (data, dispatch, form) => {
-    console.warn('handleSubmit', data, dispatch, form);
-    console.warn(this.props);
-    console.warn('this.props');
     return this.props.login(this.props.form.login.values, this.props.history);
   };
 

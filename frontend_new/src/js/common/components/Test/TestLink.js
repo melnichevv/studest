@@ -19,59 +19,28 @@ const mutation = gql`
 class TestLink extends Component {
   static propTypes = {
     test: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
   };
-
-  constructor(props) {
-    super(props);
-
-    this.startTest = this.startTest.bind(this);
-  }
-
-  startTest(event) {
-    let { answers } = this.state;
-    if (!answers) {
-      answers = [];
-    }
-    const index = answers.indexOf(event.target.value);
-    if (!event.target.checked) {
-      if (index > -1) {
-        answers.splice(index, 1);
-      }
-    } else {
-      if (index === -1) {
-        answers.push(event.target.value);
-      }
-    }
-    this.setState({
-      answers,
-      isUpdated: true,
-    });
-    console.warn('this.state', this.state);
-    this.props
-      .mutate({
-        variables: {
-          question: this.props.question.uuid,
-          answers,
-          testResult: this.props.testResult.uuid,
-        },
-      })
-      .then((res) => {
-        console.warn('res', res);
-      })
-      .catch((err) => {
-        console.log('Network error');
-      });
-  }
 
   render() {
     console.warn(this.props.test);
+    if (this.props.user.is_staff) {
+      return (
+        <Link
+          to={`/tests/${this.props.test.uuid}/admin/`}
+          replace
+        >
+          {this.props.test.name}
+        </Link>
+      );
+    }
     if (this.props.test.result) {
       return (
         <Link
           to={`/tests/${this.props.test.result.uuid}/details/`}
           replace
         >
-          {this.props.test.name}
+          {this.props.test.name}[{this.props.test.result}
         </Link>
       );
     } else if (this.props.test.result === null) {

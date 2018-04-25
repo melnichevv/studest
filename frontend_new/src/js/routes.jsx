@@ -11,6 +11,7 @@ import LoginView from './views/login';
 import RegisterView from './views/register';
 import TestsView from './views/tests';
 import TestDetailsView from './views/tests/TestDetailsView';
+import TestAdminDetailsView from './views/tests/TestAdminDetailsView';
 import TestPreView from './views/tests/TestPreView';
 
 
@@ -25,6 +26,7 @@ module.exports = (
         <Route path="/login" component={LoginView} />
         <Route path="/register" component={RegisterView} />
         <Route path="/tests/:uuid/details/" component={TestDetailsView} />
+        <Route path="/tests/:uuid/admin/" component={TestAdminDetailsView} />
         <Route path="/tests/:uuid/pre/" component={TestPreView} />
         <Route path="/tests" component={TestsView} />
       </Switch>

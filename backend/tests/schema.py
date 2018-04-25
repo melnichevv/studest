@@ -4,6 +4,7 @@ from graphene import String, Int, Boolean
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter.fields import DjangoFilterConnectionField
 from tests.models import Test, Question, Answer, TestResult, QuestionAnswer
+from users.models import User
 from users.schema import UserType
 
 
@@ -62,8 +63,16 @@ class QuestionType(DjangoObjectType):
 
     @staticmethod
     def resolve_current_answer(instance: Question, info):
+        user = info.context.user
+        test_user = user
+        user_id = info.variable_values.get('userId')
+        if user_id and user.is_staff:
+            try:
+                test_user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return None
         user_answers = instance.user_answers.filter(
-            student=info.context.user,
+            student=test_user,
             result__uuid=info.variable_values['uuid']
         ).first()
         if not user_answers:
@@ -225,7 +234,7 @@ class Query(object):
             ).values_list('id', flat=True)
         )
         test_ids = set(user_tests_ids + accessible_tests_ids)
-        results = Test.objects.filter(pk__in=test_ids).all()
+        results = Test.objects.filter(pk__in=test_ids).order_by('-start_at').all()
         # TODO filter results here
         return results
 
@@ -242,14 +251,26 @@ class Query(object):
     test_result = graphene.Field(
         TestResultType,
         id=graphene.ID(),
-        uuid=graphene.String()
+        uuid=graphene.String(),
+        user_id=graphene.String()
     )
 
-    def resolve_test_result(self, info, uuid):
+    def resolve_test_result(self, info, uuid, user_id=None):
         user = info.context.user
         if not user.is_authenticated:
             return None
-        result = TestResult.objects.filter(user=user, uuid=uuid).first()
+
+        # Use User based on `user_id` if current user is_staff=True
+        test_user = user
+        if user_id and user.is_staff:
+            try:
+                test_user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return None
+
+        result = TestResult.objects.filter(user=test_user, uuid=uuid).first()
+        if result and not user.is_staff and user != result.user:
+            return None
         return result
 
     test_questions = DjangoFilterConnectionField(QuestionType)

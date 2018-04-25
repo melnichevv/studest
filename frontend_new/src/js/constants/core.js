@@ -1,5 +1,6 @@
 /* used for async saving user changes */
 export const SAVE_TIMEOUT = 3000;
+export const REFETCH_TIMEOUT = 3000;
 
 export const MIN_ITEM_LOAD = 10;
 

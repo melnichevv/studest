@@ -4,6 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
 import { FormGroup, Label, Input } from 'reactstrap';
+import TextQuestion from "./TextQuestion";
 require('./Question.css');
 
 const mutation = gql`
@@ -40,7 +41,8 @@ function mapDispatchToProps(dispatch) {
 class RadioQuestion extends Component {
   static propTypes = {
     question: PropTypes.object.isRequired,
-    testResult: PropTypes.object.isRequired,
+    testResult: PropTypes.object,
+    readonly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -52,7 +54,19 @@ class RadioQuestion extends Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    // only update answers if the data has changed
+    if (prevProps.question.currentAnswer !== this.props.question.currentAnswer) {
+      this.setState({
+        currentAnswer: this.props.question.currentAnswer,
+      });
+    }
+  }
+
   handleChange(event) {
+    if (this.props.readonly) {
+      return;
+    }
     console.warn(this.props, event.target.name);
     const oldAnswer = this.state.currentAnswer;
     this.setState({
@@ -93,6 +107,7 @@ class RadioQuestion extends Component {
                     value={item.node.uuid}
                     onChange={this.handleChange}
                     checked={this.state.currentAnswer === item.node.uuid}
+                    readOnly={this.props.readonly}
                   />
                   {item.node.text}
                 </Label>
@@ -104,6 +119,11 @@ class RadioQuestion extends Component {
     );
   }
 }
+
+RadioQuestion.defaultProps = {
+  testResult: {},
+  readonly: false,
+};
 
 // eslint-disable-next-line no-class-assign
 // RadioQuestion = graphql(query)(RadioQuestion);

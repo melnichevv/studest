@@ -34,7 +34,8 @@ function mapDispatchToProps(dispatch) {
 class TextQuestion extends PureComponent {
   static propTypes = {
     question: PropTypes.object.isRequired,
-    testResult: PropTypes.object.isRequired,
+    testResult: PropTypes.object,
+    readonly: PropTypes.bool,
   };
 
   constructor(props) {
@@ -44,6 +45,15 @@ class TextQuestion extends PureComponent {
     };
     this.saveResults = this.saveResults.bind(this);
     this.handleChange = this.handleChange.bind(this);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // only update answers if the data has changed
+    if (prevProps.question.currentAnswer !== this.props.question.currentAnswer) {
+      this.setState({
+        currentAnswer: this.props.question.currentAnswer ? this.props.question.currentAnswer : '',
+      });
+    }
   }
 
   saveResults(value) {
@@ -68,6 +78,9 @@ class TextQuestion extends PureComponent {
   }
 
   handleChange(event) {
+    if (this.props.readonly) {
+      return;
+    }
     this.setState(Object.assign({}, this.state, {
       lastEdit: Date.now(),
       currentAnswer: event.target.value,
@@ -89,6 +102,7 @@ class TextQuestion extends PureComponent {
               value={this.state.currentAnswer}
               onChange={this.handleChange}
               rows={Math.max(this.state.currentAnswer.split(/\r*\n/).length, 3)}
+              readOnly={this.props.readonly}
             />
           </FormGroup>
         </FormGroup>
@@ -96,6 +110,11 @@ class TextQuestion extends PureComponent {
     );
   }
 }
+
+TextQuestion.defaultProps = {
+  testResult: {},
+  readonly: false,
+};
 
 
 // eslint-disable-next-line no-class-assign

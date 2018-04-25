@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
@@ -25,13 +24,7 @@ const mapStateToProps = state => ({
   ...state,
 });
 
-function mapDispatchToProps(dispatch) {
-  return {
-    // ...bindActionCreators(auth, dispatch),
-  };
-}
-
-@connect(mapStateToProps, mapDispatchToProps)
+@connect(mapStateToProps)
 class RegisterView extends Component {
   static propTypes = {
     register: PropTypes.func.isRequired,
@@ -47,10 +40,7 @@ class RegisterView extends Component {
   componentDidMount() {
     console.warn(this.props, this.state);
   }
-  handleSubmit = (data, dispatch, form) => {
-    console.warn('handleSubmit', data, dispatch, form);
-    console.warn(this.props);
-    console.warn('this.props');
+  handleSubmit = () => {
     this.props
       .mutate({
         variables: this.props.form.register.values,

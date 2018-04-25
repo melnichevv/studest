@@ -220,6 +220,7 @@ class Query(object):
             Test.objects.filter(
                 status=Test.STATUS_OPEN,
                 start_at__lte=timezone.now(),
+                end_at__gte=timezone.now(),
                 accessible_by=Test.ACCESSIBLE_BY_ANYONE
             ).values_list('id', flat=True)
         )

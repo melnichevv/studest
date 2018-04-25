@@ -160,6 +160,7 @@ class Test(UuidMixin, TimeStampedModel):
     description = models.TextField(_('description'), null=True, blank=True)
     automatic_start = models.BooleanField(_('should test start automatically'), default=False)
     start_at = models.DateTimeField(_('start at'))
+    end_at = models.DateTimeField(_('end at'))
     accessible_by = models.CharField(
         _('accessible by'),
         max_length=50,

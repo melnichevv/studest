@@ -5,6 +5,8 @@ from .models import Answer, Question, Test, TestResult, QuestionAnswer, Label
 
 
 class AnswerInline(admin.TabularInline):
+    readonly_fields = ('uuid',)
+    exclude = ('uuid', )
     model = Answer
     extra = 1
     min_num = 1
@@ -14,6 +16,7 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [
         AnswerInline,
     ]
+    readonly_fields = ('uuid',)
     list_filter = ('labels__name', )
 
     # class Media:
@@ -59,6 +62,7 @@ class TestAdmin(admin.ModelAdmin):
         QuestionInline,
         TestResultInline
     ]
+    readonly_fields = ('uuid',)
     exclude = ('questions',)
 
 

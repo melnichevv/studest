@@ -42,18 +42,28 @@ class TextQuestion extends PureComponent {
     super(props);
     this.state = {
       currentAnswer: props.question.currentAnswer ? props.question.currentAnswer : '',
+      updated: false,
     };
     this.saveResults = this.saveResults.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.fadeOut = this.fadeOut.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
     // only update answers if the data has changed
     if (prevProps.question.currentAnswer !== this.props.question.currentAnswer) {
       this.setState({
+        updated: true,
         currentAnswer: this.props.question.currentAnswer ? this.props.question.currentAnswer : '',
       });
+      setTimeout(this.fadeOut, 3000);
     }
+  }
+
+  fadeOut() {
+    this.setState(Object.assign({}, this.state, {
+      updated: false,
+    }));
   }
 
   saveResults(value) {
@@ -94,7 +104,7 @@ class TextQuestion extends PureComponent {
       <div className="text-question">
         <FormGroup tag="div">
           <legend>{this.props.question.question}</legend>
-          <FormGroup>
+          <FormGroup check className={this.state.updated ? 'updated' : ''}>
             <Input
               type="textarea"
               name={this.props.question.uuid}

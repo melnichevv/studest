@@ -63,18 +63,28 @@ class CheckboxQuestion extends Component {
     this.state = {
       answers,
       isUpdated,
+      updated: false,
     };
     this.handleChange = this.handleChange.bind(this);
+    this.fadeOut = this.fadeOut.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
     // only update answers if the data has changed
     if (prevProps.question.currentAnswer !== this.props.question.currentAnswer) {
       this.setState({
+        updated: true,
         answers: this.props.question.currentAnswer ? this.props.question.currentAnswer : [],
         isUpdated: false,
       });
+      setTimeout(this.fadeOut, 3000);
     }
+  }
+
+  fadeOut() {
+    this.setState(Object.assign({}, this.state, {
+      updated: false,
+    }));
   }
 
   handleChange(event) {
@@ -122,7 +132,7 @@ class CheckboxQuestion extends Component {
         <FormGroup tag="div">
           <legend>{this.props.question.question}</legend>
           {this.props.question.answers.edges.map(item => (
-            <FormGroup check>
+            <FormGroup check className={(this.state.updated && this.state.answers.includes(item.node.uuid)) ? 'updated' : ''}>
               <Label check>
                 <Input
                   type="checkbox"

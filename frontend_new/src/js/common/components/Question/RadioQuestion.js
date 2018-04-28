@@ -49,18 +49,28 @@ class RadioQuestion extends Component {
     super(props);
     this.state = {
       currentAnswer: props.question.currentAnswer,
+      updated: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
+    this.fadeOut = this.fadeOut.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState) {
     // only update answers if the data has changed
     if (prevProps.question.currentAnswer !== this.props.question.currentAnswer) {
       this.setState({
+        updated: true,
         currentAnswer: this.props.question.currentAnswer,
       });
+      setTimeout(this.fadeOut, 3000);
     }
+  }
+
+  fadeOut() {
+    this.setState(Object.assign({}, this.state, {
+      updated: false,
+    }));
   }
 
   handleChange(event) {
@@ -99,7 +109,7 @@ class RadioQuestion extends Component {
           <legend>{this.props.question.question}</legend>
           {this.props.question.answers.edges.map(item => (
             <div key={item.node.uuid}>
-              <FormGroup check>
+              <FormGroup check className={(this.state.updated && this.state.currentAnswer === item.node.uuid) ? 'updated' : ''}>
                 <Label check>
                   <Input
                     type="radio"

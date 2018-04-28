@@ -10,7 +10,7 @@ import CheckboxQuestion from '../../common/components/Question/CheckboxQuestion'
 import TextQuestion from '../../common/components/Question/TextQuestion';
 import {
   REFETCH_TIMEOUT,
-  TEST_RESULT_STATUS_DONE,
+  TEST_RESULT_STATUS_DONE, TEST_RESULT_STATUS_IN_PROGRESS,
   TEST_RESULT_STATUS_REQUIRES_REVIEW,
 } from '../../constants/core';
 
@@ -196,7 +196,9 @@ class TestAdminDetailsView extends Component {
               switchingUser: false,
               currentTest: res.data.testResult.uuid,
             }));
-            setTimeout(this.fetchTestResult, REFETCH_TIMEOUT, testResult);
+            if (res.data.testResult.status === TEST_RESULT_STATUS_IN_PROGRESS) {
+              setTimeout(this.fetchTestResult, REFETCH_TIMEOUT, testResult);
+            }
           }
         }
       })
@@ -226,9 +228,14 @@ class TestAdminDetailsView extends Component {
         <div>Start at: {processDate(data.test.startAt)}</div>
         <div>Description: {data.test.description}</div>
         <div>
-          <h4>
-            Currently passing this test
-          </h4>
+          <div className="force-update-table">
+            <h4>
+              Currently passing this test
+            </h4>
+            <button onClick={() => { this.refetchData(true); }}>
+              Force update
+            </button>
+          </div>
           {
             data.test.solvedTests &&
             <Table striped>
@@ -332,11 +339,6 @@ class TestAdminDetailsView extends Component {
     } else {
       testBody = (
         <div>
-          <div>
-            <button onClick={() => { this.refetchData(true); }}>
-              Force update
-            </button>
-          </div>
           {currentTest.questions.edges.map(item => (
             <div key={item.node.id}>
               {item.node.imgUrl ? <p>Image URL: {item.node.imgUrl}</p> : ''}

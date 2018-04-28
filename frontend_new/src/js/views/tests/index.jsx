@@ -75,6 +75,7 @@ class TestsView extends Component {
 
   render() {
     const { data } = this.props;
+    console.warn('data', data);
     if (data.loading) {
       /* TODO This causes a warning of bad code. Fixme */
       // const initialSearch = queryString.parse(this.props.location.search).search;

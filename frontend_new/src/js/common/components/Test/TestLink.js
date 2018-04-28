@@ -40,7 +40,7 @@ class TestLink extends Component {
           to={`/tests/${this.props.test.result.uuid}/details/`}
           replace
         >
-          {this.props.test.name}[{this.props.test.result}
+          {this.props.test.name}
         </Link>
       );
     } else if (this.props.test.result === null) {

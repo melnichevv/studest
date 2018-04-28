@@ -170,22 +170,15 @@ class TestAdminDetailsView extends Component {
     });
   };
 
-  viewTest = (testResult, disableSwitching = true, newForceStop) => {
-    console.warn('viewTest', testResult, newForceStop);
-    const forceStop = newForceStop !== undefined ? newForceStop : this.state.forceStop;
+  viewTest = (testResult) => {
     this.setState(Object.assign({}, this.state, {
-      switchingUser: disableSwitching,
       currentTest: testResult.uuid,
-      forceStop,
+      forceStop: false,
     }));
-    this.fetchTestResult(testResult, forceStop);
-    console.warn(this.state.currentTest, testResult.uuid);
-    if (!forceStop && (this.state.currentTest === testResult.uuid)) {
-      setTimeout(this.viewTest, REFETCH_TIMEOUT, testResult);
-    }
+    this.fetchTestResult(testResult);
   };
 
-  fetchTestResult = (testResult, forceStop) => {
+  fetchTestResult = (testResult) => {
     console.warn('fetchTestResult', testResult, this.state);
     this.props.client.query({
       query: testResultQuery,
@@ -196,14 +189,15 @@ class TestAdminDetailsView extends Component {
       fetchPolicy: 'network-only',
     })
       .then((res) => {
-        console.warn(res, !forceStop, forceStop);
-        if (res.data && !res.data.loading && !forceStop) {
-          console.warn('setting new state');
-          this.setState(Object.assign({}, this.state, {
-            testResult: res.data.testResult,
-            switchingUser: false,
-            currentTest: res.data.testResult.uuid,
-          }));
+        if (res.data) {
+          if (!this.state.forceStop && (this.state.currentTest === testResult.uuid)) {
+            this.setState(Object.assign({}, this.state, {
+              testResult: res.data.testResult,
+              switchingUser: false,
+              currentTest: res.data.testResult.uuid,
+            }));
+            setTimeout(this.fetchTestResult, REFETCH_TIMEOUT, testResult);
+          }
         }
       })
       .catch((err) => {

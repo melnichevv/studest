@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { Container, Row, Col, Jumbotron } from 'reactstrap';
 
 import { processDate } from '../../utils/date';
 import RadioQuestion from '../../common/components/Question/RadioQuestion';
 import CheckboxQuestion from '../../common/components/Question/CheckboxQuestion';
 import TextQuestion from '../../common/components/Question/TextQuestion';
 import { TEST_RESULT_STATUS_DONE, TEST_RESULT_STATUS_REQUIRES_REVIEW } from '../../constants/core';
+
+require('./Tests.css');
 
 export const query = gql`
   query DetailView($uuid: String!) {
@@ -122,17 +125,18 @@ class TestDetailsView extends Component {
     }
     data.test = data.testResult.test;
     const testHeader = (
-      <div>
-        <h2 className="test-title">Test "{data.test.name}"</h2>
-        <div>Time allowed: {data.test.minutes}</div>
+      <Jumbotron>
+        <h3 className="display-4 test-title">Test "{data.test.name}"</h3>
+        <p className="lead">Description: {data.test.description}</p>
+        <hr className="my-2" />
+        <div>Time allowed: {data.test.minutes} minutes</div>
         <div>Start at: {processDate(data.test.startAt)}</div>
-        <div>Description: {data.test.description}</div>
-      </div>
+      </Jumbotron>
     );
     let testBody = '';
     if (this.state.finishing) {
       testBody = (
-        <div>
+        <Row>
           <h3>
             Well done!
             {
@@ -160,17 +164,21 @@ class TestDetailsView extends Component {
               </div>
             }
           </h3>
-        </div>
+        </Row>
       );
     } else {
       testBody = (
-        <div>
+        <Jumbotron>
           {data.test.questions.edges.map(item => (
-            <div key={item.node.id}>
-              {item.node.imgUrl ? <p>Image URL: {item.node.imgUrl}</p> : ''}
-              {item.node.audioUrl ? <p>Audio URL: {item.node.audioUrl}</p> : ''}
-              {item.node.videoURL ? <p>Video URL: {item.node.videoUrl}</p> : ''}
-              {item.node.otherURL ? <p>Other URL: {item.node.otherURL}</p> : ''}
+            <Row key={item.node.id} className="question-row">
+              <Col sm={{ order: 1 }} md={{ size: 6, order: 2 }}>
+                <div>
+                  {item.node.imgUrl ? <p>Image URL: {item.node.imgUrl}</p> : ''}
+                  {item.node.audioUrl ? <p>Audio URL: {item.node.audioUrl}</p> : ''}
+                  {item.node.videoUrl ? <p>Video URL: {item.node.videoUrl}</p> : ''}
+                  {item.node.otherUrl ? <p>Other URL: {item.node.otherUrl}</p> : ''}
+                </div>
+              </Col>
               {item.node.type === 'radio'}
               {
                 item.node.type === 'radio' &&
@@ -194,21 +202,21 @@ class TestDetailsView extends Component {
                   testResult={data.testResult}
                 />
               }
-            </div>
+            </Row>
           ))}
-          <div>
+          <Row>
             <button onClick={this.finishTest}>
               Finish test
             </button>
-          </div>
-        </div>
+          </Row>
+        </Jumbotron>
       );
     }
     return (
-      <div>
+      <Container>
         {testHeader}
         {testBody}
-      </div>
+      </Container>
     );
   }
 }

@@ -4,10 +4,9 @@ import { bindActionCreators } from 'redux';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
-import { FormGroup, Label, Input } from 'reactstrap';
+import { FormGroup, Label, Input, Col } from 'reactstrap';
 
 import * as testActions from '../../../actions/testActions';
-import TextQuestion from "./TextQuestion";
 
 require('./Question.css');
 
@@ -128,7 +127,7 @@ class CheckboxQuestion extends Component {
 
   render() {
     return (
-      <div className="checkbox-question">
+      <Col sm={{ order: 2 }} md={{ size: 6, order: 1 }} className="checkbox-question">
         <FormGroup tag="div">
           <legend>{this.props.question.question}</legend>
           {this.props.question.answers.edges.map(item => (
@@ -147,7 +146,7 @@ class CheckboxQuestion extends Component {
             </FormGroup>
           ))}
         </FormGroup>
-      </div>
+      </Col>
     );
   }
 }

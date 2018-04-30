@@ -1,0 +1,21 @@
+.refetching-status {
+  display: inline-block;
+  float: right;
+}
+
+.refetching-button, .force-update-table {
+  display: inline-block;
+  font-size: 12px;
+  float: right;
+}
+
+.question-row {
+  border: 1px solid #9e9fa2;
+  margin-bottom: 15px;
+  border-radius: 0.3rem;
+  padding: 10px;
+}
+
+.question-row textarea {
+  background-color: #e9ecef;
+}

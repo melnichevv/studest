@@ -11,3 +11,7 @@ legend:first-letter {
   max-width: 500px;
   min-width: 100px;
 }
+
+.radio-question legend {
+  word-wrap: break-word;
+}

@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import PropTypes from 'prop-types';
-import { FormGroup, Label, Input } from 'reactstrap';
-import TextQuestion from "./TextQuestion";
+import { FormGroup, Label, Input, Col } from 'reactstrap';
 require('./Question.css');
 
 const mutation = gql`
@@ -104,7 +103,7 @@ class RadioQuestion extends Component {
 
   render() {
     return (
-      <div className="radio-question">
+      <Col sm={{ order: 2 }} md={{ size: 6, order: 1 }} className="radio-question">
         <FormGroup tag="div">
           <legend>{this.props.question.question}</legend>
           {this.props.question.answers.edges.map(item => (
@@ -125,7 +124,7 @@ class RadioQuestion extends Component {
             </div>
           ))}
         </FormGroup>
-      </div>
+      </Col>
     );
   }
 }

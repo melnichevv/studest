@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { graphql, withApollo } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Table } from 'reactstrap';
+import { Table, Container, Row, Col, Jumbotron } from 'reactstrap';
+import YouTube from 'react-youtube';
+import { BeatLoader } from 'react-spinners';
 
 import { processDate } from '../../utils/date';
 import RadioQuestion from '../../common/components/Question/RadioQuestion';
@@ -13,6 +15,9 @@ import {
   TEST_RESULT_STATUS_DONE, TEST_RESULT_STATUS_IN_PROGRESS,
   TEST_RESULT_STATUS_REQUIRES_REVIEW,
 } from '../../constants/core';
+
+require('./Tests.css');
+
 
 export const query = gql`
   query TestDetailView($uuid: String!) {
@@ -135,11 +140,13 @@ class TestAdminDetailsView extends Component {
       switchingUser: false,
       currentTest: null,
       forceStop: false,
+      refetching: true,
     };
     this.fetchTestResult = this.fetchTestResult.bind(this);
     this.refetchData = this.refetchData.bind(this);
     this.viewTest = this.viewTest.bind(this);
     this.stopViewTest = this.stopViewTest.bind(this);
+    this.toggleRefetching = this.toggleRefetching.bind(this);
   }
 
   componentDidMount() {
@@ -167,7 +174,14 @@ class TestAdminDetailsView extends Component {
       switchingUser: false,
       currentTest: null,
       forceStop: true,
+      refetching: this.state.refetching,
     });
+  };
+
+  toggleRefetching = () => {
+    this.setState(Object.assign({}, this.state, {
+      refetching: !this.state.refetching,
+    }));
   };
 
   viewTest = (testResult) => {
@@ -180,36 +194,41 @@ class TestAdminDetailsView extends Component {
 
   fetchTestResult = (testResult) => {
     console.warn('fetchTestResult', testResult, this.state);
-    this.props.client.query({
-      query: testResultQuery,
-      variables: {
-        uuid: testResult.uuid,
-        userId: testResult.user.id,
-      },
-      fetchPolicy: 'network-only',
-    })
-      .then((res) => {
-        if (res.data) {
-          if (!this.state.forceStop && (this.state.currentTest === testResult.uuid)) {
-            this.setState(Object.assign({}, this.state, {
-              testResult: res.data.testResult,
-              switchingUser: false,
-              currentTest: res.data.testResult.uuid,
-            }));
-            if (res.data.testResult.status === TEST_RESULT_STATUS_IN_PROGRESS) {
-              setTimeout(this.fetchTestResult, REFETCH_TIMEOUT, testResult);
+    if (!this.state.refetching) {
+      setTimeout(this.fetchTestResult, REFETCH_TIMEOUT, testResult);
+    }
+    else {
+      this.props.client.query({
+        query: testResultQuery,
+        variables: {
+          uuid: testResult.uuid,
+          userId: testResult.user.id,
+        },
+        fetchPolicy: 'network-only',
+      })
+        .then((res) => {
+          if (res.data) {
+            if (!this.state.forceStop && (this.state.currentTest === testResult.uuid)) {
+              this.setState(Object.assign({}, this.state, {
+                testResult: res.data.testResult,
+                switchingUser: false,
+                currentTest: res.data.testResult.uuid,
+              }));
+              if (res.data.testResult.status === TEST_RESULT_STATUS_IN_PROGRESS) {
+                setTimeout(this.fetchTestResult, REFETCH_TIMEOUT, testResult);
+              }
             }
           }
-        }
-      })
-      .catch((err) => {
-        this.setState(Object.assign({}, this.state, {
-          testResult: {},
-          switchingUser: false,
-          currentTest: null,
-        }));
-        console.log('Network error', err);
-      });
+        })
+        .catch((err) => {
+          this.setState(Object.assign({}, this.state, {
+            testResult: {},
+            switchingUser: false,
+            currentTest: null,
+          }));
+          console.log('Network error', err);
+        });
+    }
   };
 
   render() {
@@ -222,19 +241,30 @@ class TestAdminDetailsView extends Component {
       currentTest = this.state.testResult.test;
     }
     const testHeader = (
-      <div>
-        <h2 className="test-title">Test "{data.test.name}"</h2>
-        <div>Time allowed: {data.test.minutes}</div>
+      <Jumbotron>
+        <h3 className="display-4 test-title">Test "{data.test.name}"</h3>
+        <p className="lead">Description: {data.test.description}</p>
+        <hr className="my-2" />
+        <div>Status: {data.test.status}</div>
+        <div>Time allowed: {data.test.minutes} minutes</div>
         <div>Start at: {processDate(data.test.startAt)}</div>
-        <div>Description: {data.test.description}</div>
+        <hr className="my-2" />
         <div>
-          <div className="force-update-table">
+          <div>
             <h4>
               Currently passing this test
+              <button onClick={this.toggleRefetching} className="refetching-button">
+                {
+                  this.state.refetching ? 'Stop' : 'Continue'
+                }
+              </button>
+              {
+                this.state.refetching &&
+                <p className="refetching-status">
+                  <BeatLoader alt="Refetching" />
+                </p>
+              }
             </h4>
-            <button onClick={() => { this.refetchData(true); }}>
-              Force update
-            </button>
           </div>
           {
             data.test.solvedTests &&
@@ -263,6 +293,7 @@ class TestAdminDetailsView extends Component {
                   <tr>
                     <td>
                       {testResult.node.user.firstName} {testResult.node.user.lastName}
+                      {testResult.node.uuid === this.state.currentTest ? ' (Viewing)' : ''}
                     </td>
                     <td>
                       {testResult.node.startTime && processDate(testResult.node.startTime)}
@@ -300,13 +331,19 @@ class TestAdminDetailsView extends Component {
               </tbody>
             </Table>
           }
+          {
+            data.test.solvedTests &&
+            <button onClick={() => { this.refetchData(true); }} className="force-update-table">
+              Force update table
+            </button>
+          }
         </div>
-      </div>
+      </Jumbotron>
     );
     let testBody = '';
     if (this.state.finishing) {
       testBody = (
-        <div>
+        <Jumbotron>
           <h3>
             Well done!
             {
@@ -334,17 +371,43 @@ class TestAdminDetailsView extends Component {
               </div>
             }
           </h3>
-        </div>
+        </Jumbotron>
       );
     } else {
+      const opts = {
+        height: '100',
+        width: '200',
+        playerVars: { // https://developers.google.com/youtube/player_parameters
+          autoplay: 0,
+        },
+      };
       testBody = (
-        <div>
+        <Jumbotron>
           {currentTest.questions.edges.map(item => (
-            <div key={item.node.id}>
-              {item.node.imgUrl ? <p>Image URL: {item.node.imgUrl}</p> : ''}
-              {item.node.audioUrl ? <p>Audio URL: {item.node.audioUrl}</p> : ''}
-              {item.node.videoURL ? <p>Video URL: {item.node.videoUrl}</p> : ''}
-              {item.node.otherURL ? <p>Other URL: {item.node.otherURL}</p> : ''}
+            <Row key={item.node.id} className="question-row">
+              <Col sm={{ order: 1 }} md={{ size: 6, order: 2 }}>
+                <Row>
+                  {item.node.imgUrl ?
+                    <Col md="auto" sm={{ size: 12 }}>
+                      <img src={item.node.imgUrl} alt="" />
+                    </Col> : ''
+                  }
+                  {/*{item.node.audioUrl ? <Col>Audio URL: {item.node.audioUrl}</Col> : ''}*/}
+                  {item.node.videoUrl ?
+                    <Col md="auto" sm={{ size: 12 }}>
+                      <YouTube
+                        videoId={item.node.videoUrl}
+                        opts={opts}
+                      />
+                    </Col> : ''
+                  }
+                  {item.node.otherUrl ?
+                    <Col md="auto" sm={{ size: 12 }}>
+                      <a href={item.node.otherUrl} target="_blank">Additional info</a>
+                    </Col> : ''
+                  }
+                </Row>
+              </Col>
               {item.node.type === 'radio'}
               {
                 item.node.type === 'radio' &&
@@ -370,16 +433,16 @@ class TestAdminDetailsView extends Component {
                   readonly={this.props.auth.user.is_staff}
                 />
               }
-            </div>
+            </Row>
           ))}
-        </div>
+        </Jumbotron>
       );
     }
     return (
-      <div>
+      <Container>
         {testHeader}
         {testBody}
-      </div>
+      </Container>
     );
   }
 }

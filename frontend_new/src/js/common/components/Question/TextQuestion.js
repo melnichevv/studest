@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, Input } from 'reactstrap';
+import { FormGroup, Input, Col } from 'reactstrap';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { SAVE_TIMEOUT } from '../../../constants/core';
@@ -101,7 +101,7 @@ class TextQuestion extends PureComponent {
 
   render() {
     return (
-      <div className="text-question">
+      <Col sm={{ order: 2 }} md={{ size: 6, order: 1 }} className="text-question">
         <FormGroup tag="div">
           <legend>{this.props.question.question}</legend>
           <FormGroup check className={this.state.updated ? 'updated' : ''}>
@@ -116,7 +116,7 @@ class TextQuestion extends PureComponent {
             />
           </FormGroup>
         </FormGroup>
-      </div>
+      </Col>
     );
   }
 }

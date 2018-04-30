@@ -7,16 +7,17 @@ import {
   Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand,
   Nav,
   NavItem,
   NavLink,
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
 } from 'reactstrap';
 import * as logout from '../../../actions/authActions';
+
+require('./Header.css');
 
 const mapStateToProps = state => ({
   ...state,

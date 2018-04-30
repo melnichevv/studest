@@ -6266,6 +6266,10 @@ load-json-file@^4.0.0:
     pify "^3.0.0"
     strip-bom "^3.0.0"
 
+load-script@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/load-script/-/load-script-1.0.0.tgz#0491939e0bee5643ee494a7e3da3d2bac70c6ca4"
+
 loader-runner@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/loader-runner/-/loader-runner-2.3.0.tgz#f482aea82d543e07921700d5a46ef26fdac6b8a2"
@@ -8322,7 +8326,7 @@ promise@^7.1.1:
   dependencies:
     asap "~2.0.3"
 
-prop-types@^15.0.0, prop-types@^15.5.0, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1:
+prop-types@^15.0.0, prop-types@^15.5.0, prop-types@^15.5.10, prop-types@^15.5.3, prop-types@^15.5.4, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.1.tgz#36644453564255ddda391191fb3a125cbdf654ca"
   dependencies:
@@ -8704,6 +8708,14 @@ react-transition-group@^2.2.1:
     loose-envify "^1.3.1"
     prop-types "^15.5.8"
     warning "^3.0.0"
+
+react-youtube@^7.6.0:
+  version "7.6.0"
+  resolved "https://registry.yarnpkg.com/react-youtube/-/react-youtube-7.6.0.tgz#ea4b7a9396f635b9f2a9f03bfe2a39b93cbdd59d"
+  dependencies:
+    lodash "^4.17.4"
+    prop-types "^15.5.3"
+    youtube-player "^5.4.0"
 
 react@^16.0.0:
   version "16.3.1"
@@ -9564,6 +9576,10 @@ simple-swizzle@^0.2.2:
   resolved "https://registry.yarnpkg.com/simple-swizzle/-/simple-swizzle-0.2.2.tgz#a4da6b635ffcccca33f70d17cb92592de95e557a"
   dependencies:
     is-arrayish "^0.3.1"
+
+sister@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/sister/-/sister-3.0.0.tgz#88eb57047cb283da1e070b1a7cae8212f3bcb2db"
 
 slash@^1.0.0:
   version "1.0.0"
@@ -11275,6 +11291,14 @@ yauzl@^2.2.1, yauzl@^2.4.2:
 yeast@0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
+
+youtube-player@^5.4.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/youtube-player/-/youtube-player-5.5.0.tgz#95f058534f9544586185551d0d2d33f381f6587a"
+  dependencies:
+    debug "^2.6.6"
+    load-script "^1.0.0"
+    sister "^3.0.0"
 
 zen-observable-ts@^0.8.6:
   version "0.8.8"

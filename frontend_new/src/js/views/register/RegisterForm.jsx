@@ -7,13 +7,14 @@ import { email, required, minLength2, minLength5 } from '../../utils/validation'
 const renderField = ({
   input,
   label,
+  placeholder,
   type,
   meta: { touched, error, warning },
 }) => (
   <div>
     <label>{label}</label>
     <div>
-      <input {...input} placeholder={label} type={type} />
+      <input {...input} placeholder={placeholder} type={type} />
       {touched &&
         ((error && <span className="text-danger">{error}</span>) ||
           (warning && <span className="text-warning">{warning}</span>))}
@@ -51,7 +52,7 @@ let RegisterForm = (props) => {
           placeholder="Last name"
         />
         {
-          formErrors.latName &&
+          formErrors.lastName &&
           <div>
             {formErrors.lastName}
           </div>

@@ -158,7 +158,7 @@ class TestsView extends Component {
               {
                 (!data.userTests || data.userTests.edges.length === 0) &&
                 <tr>
-                  <td colSpan="5">
+                  <td colSpan="6">
                     No tests
                   </td>
                 </tr>

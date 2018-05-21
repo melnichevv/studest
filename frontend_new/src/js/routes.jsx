@@ -13,6 +13,7 @@ import TestsView from './views/tests';
 import TestDetailsView from './views/tests/TestDetailsView';
 import TestAdminDetailsView from './views/tests/TestAdminDetailsView';
 import TestPreView from './views/tests/TestPreView';
+import IndexView from './views/index';
 
 
 const HeaderWithRouter = withRouter(props => <Header {...props} />);
@@ -29,6 +30,7 @@ module.exports = (
         <Route path="/tests/:uuid/admin/" component={TestAdminDetailsView} />
         <Route path="/tests/:uuid/pre/" component={TestPreView} />
         <Route path="/tests" component={TestsView} />
+        <Route path="/" component={IndexView} />
       </Switch>
     </div>
   </div>

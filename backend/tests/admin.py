@@ -64,6 +64,31 @@ class TestAdmin(admin.ModelAdmin):
     ]
     readonly_fields = ('uuid',)
     exclude = ('questions',)
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': (
+                'name',
+                'description',
+                'status',
+                'minutes',
+                'start_at',
+                'end_at',
+                'automatic_start',
+                'accessible_by'
+            ),
+        }),
+    )
+
+    def get_fieldsets(self, request, obj=None):
+        if not obj:
+            return self.add_fieldsets
+        return super().get_fieldsets(request, obj)
+
+    # def get_inline_formsets(self, request, formsets, inline_instances, obj=None):
+    #     if not obj:
+    #         return []
+    #     return super().get_inline_formsets(request, formsets, inline_instances, obj)
 
 
 class QuestionAnswerAdmin(admin.ModelAdmin):

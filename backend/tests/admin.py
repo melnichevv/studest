@@ -1,5 +1,9 @@
+from django.conf.urls import url
 from django.contrib import admin
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import path
 from django.utils.translation import ugettext_lazy as _
+from django.views.generic import FormView
 
 from .models import Answer, Question, Test, TestResult, QuestionAnswer, Label
 
@@ -25,10 +29,42 @@ class QuestionAdmin(admin.ModelAdmin):
     #     }
 
 
+class QuestionAnswerInline(admin.TabularInline):
+    readonly_fields = ('uuid', 'user_answers', 'all_answers', 'correct_answers')
+    fieldsets = (
+        (None, {'fields': ('question', 'all_answers', 'correct_answers', 'user_answers', 'correct')}),
+    )
+    exclude = ('uuid', 'answer')
+    model = QuestionAnswer
+    extra = 0
+
+
 class TestResultAdmin(admin.ModelAdmin):
+    change_form_template = 'admin/test_results/change_form.html'
     fieldsets = (
         (None, {'fields': ('test', 'user', 'status', 'result', 'start_time', 'end_time', 'uuid')}),
     )
+    inlines = [
+        QuestionAnswerInline,
+    ]
+
+    def get_urls(self):
+        urls = super().get_urls()
+        my_urls = [
+            url(
+                '^(?P<test_result_id>\d+)/calculate-results/$',
+                self.calculate_results,
+                name='calculate_test_results'
+            )
+        ]
+        return my_urls + urls
+
+    def calculate_results(self, request, test_result_id):
+        test_result = get_object_or_404(TestResult, pk=test_result_id)
+        if test_result.status in (TestResult.REQUIRES_REVIEW, TestResult.DONE):
+            test_result.calculate_results()
+            test_result.save()
+        return redirect('admin:tests_testresult_change', test_result_id)
 
     def get_fieldsets(self, request, obj=None):
         if obj:

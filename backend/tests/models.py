@@ -342,3 +342,31 @@ class QuestionAnswer(UuidMixin, TimeStampedModel):
         if self.question.type == self.question.RADIO:
             return
         return
+
+    @property
+    def all_answers(self):
+        return '\n'.join(
+            self.question.all_answers.values_list('text', flat=True)
+        )
+
+    @property
+    def correct_answers(self):
+        return '\n'.join(
+            self.question.correct_answers.values_list('text', flat=True)
+        )
+
+    @property
+    def user_answers(self):
+        if not self.answer:
+            return
+        try:
+            answer = self.answer[0]
+            if not isinstance(answer, list):
+                answer = [answer]
+        except Exception:
+            return
+
+        res = '\n'.join(
+            Answer.objects.filter(uuid__in=answer).values_list('text', flat=True)
+        )
+        return res

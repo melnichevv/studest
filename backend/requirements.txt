@@ -3,7 +3,7 @@ dj-database-url
 djangorestframework-jwt
 djangorestframework
 markdown
-django-filter
+django-filter==1.1.0
 django-cors-headers
 graphene-django>2.*
 pytest
@@ -23,4 +23,4 @@ pytz
 Rx
 singledispatch
 six
-typing==3.6.4
+typing==3.6.5
